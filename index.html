@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valmiranda Mini App</title>
+    <!-- Script esencial de Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: var(--tg-theme-button-color, #248bed);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Panel de Control</h1>
+    <p>Hola, <span id="user-name">Usuario</span></p>
+    <button id="main-button">Enviar saludo al bot</button>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Expandir la app
+
+        // Mostrar el nombre del usuario de Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+        }
+
+        // Configurar el botón principal
+        const btn = document.getElementById('main-button');
+        btn.addEventListener('click', () => {
+            tg.sendData("Hola desde la Mini App"); // Esto lo recibe tu bot de Python
+        });
+    </script>
+</body>
+</html>
