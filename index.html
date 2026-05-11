@@ -8,61 +8,42 @@
     <style>
         :root { --p-color: #27ae60; --bg: #f8f9fa; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .header { text-align: center; padding: 10px 0; border-bottom: 2px solid var(--p-color); margin-bottom: 20px; }
-        
-        /* Dashboard Estilo FINA */
+        .header { text-align: center; padding: 10px 0; border-bottom: 2px solid var(--p-color); margin-bottom: 20px; font-weight: bold; }
         .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stat-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border-left: 5px solid var(--p-color); }
         .stat-card span { font-size: 11px; color: #7f8c8d; text-transform: uppercase; font-weight: bold; }
         .stat-card h2 { margin: 8px 0 0; font-size: 20px; color: #2c3e50; }
-
-        .btn-action { width: 100%; background: var(--p-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-action { width: 100%; background: var(--p-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="header">🚀 VALMIRANDA C.A. ADMIN</div>
+    <div class="header">🚀 VALMIRANDA ADMIN</div>
 
     <div class="stats-container">
-        <div class="stat-card">
-            <span>Ventas (Hoy)</span>
-            <h2 id="ventas-hoy">Cargando...</h2>
-        </div>
-        <div class="stat-card" style="border-left-color: #e67e22;">
-            <span>Ganancia Bruta</span>
-            <h2 id="ganancia-neta" style="color: #e67e22;">Cargando...</h2>
-        </div>
-        <div class="stat-card" style="border-left-color: #3498db;">
-            <span>Productos</span>
-            <h2 id="total-productos" style="color: #3498db;">--</h2>
-        </div>
-        <div class="stat-card" style="border-left-color: #e74c3c;">
-            <span>Stock Bajo</span>
-            <h2 id="stock-bajo" style="color: #e74c3c;">0</h2>
-        </div>
+        <div class="stat-card"><span>Ventas (Hoy)</span><h2 id="v-hoy">...</h2></div>
+        <div class="stat-card" style="border-left-color: #e67e22;"><span>Ganancia</span><h2 id="g-neta" style="color: #e67e22;">...</h2></div>
+        <div class="stat-card" style="border-left-color: #3498db;"><span>Stock</span><h2 id="t-prod" style="color: #3498db;">...</h2></div>
+        <div class="stat-card" style="border-left-color: #e74c3c;"><span>Alertas</span><h2 id="s-bajo" style="color: #e74c3c;">...</h2></div>
     </div>
 
-    <button class="btn-action" onclick="enviarComando('VENDER')">🛒 NUEVA VENTA</button>
-    <button class="btn-action" style="background:#2c3e50;" onclick="enviarComando('INVENTARIO')">📦 VER ALMACÉN</button>
+    <button class="btn-action" onclick="enviar('VENDER')">🛒 NUEVA VENTA</button>
+    <button class="btn-action" style="background:#2c3e50;" onclick="enviar('INVENTARIO')">📦 INVENTARIO</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
 
-        // Al abrir la app, pedimos los datos al bot para actualizar el Dashboard
-        function solicitarDatos() {
-            // Simulamos la carga por ahora. En el siguiente paso 
-            // haremos que el bot los envíe automáticamente.
-            document.getElementById('ventas-hoy').innerText = "0.00$";
-            document.getElementById('ganancia-neta').innerText = "0.00$";
-        }
+        // Esta función lee los datos que el bot envía por la URL
+        const params = new URLSearchParams(window.location.search);
+        document.getElementById('v-hoy').innerText = (params.get('v') || '0') + "$";
+        document.getElementById('g-neta').innerText = (params.get('g') || '0') + "$";
+        document.getElementById('t-prod').innerText = params.get('t') || '0';
+        document.getElementById('s-bajo').innerText = params.get('b') || '0';
 
-        function enviarComando(cmd) {
+        function enviar(cmd) {
             tg.sendData(cmd);
             tg.close();
         }
-
-        solicitarDatos();
     </script>
 </body>
 </html>
