@@ -12,12 +12,12 @@
     </style>
 </head>
 <body>
-    <h1>🍏 Bodega Valmiranda</h1>
-    <p>Seleccione un producto:</p>
+    <h1>🍏 Valmiranda POS</h1>
+    <p>Seleccione un producto para el carrito:</p>
 
-    <div class="card" onclick="enviar('Papa')"><span>Papa</span><button>Pedir</button></div>
-    <div class="card" onclick="enviar('Cebolla')"><span>Cebolla</span><button>Pedir</button></div>
-    <div class="card" onclick="enviar('Tomate')"><span>Tomate</span><button>Pedir</button></div>
+    <div class="card" onclick="enviar('Papa')"><span>Papa</span><button>Elegir</button></div>
+    <div class="card" onclick="enviar('Cebolla')"><span>Cebolla</span><button>Elegir</button></div>
+    <div class="card" onclick="enviar('Tomate')"><span>Tomate</span><button>Elegir</button></div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -25,7 +25,7 @@
         tg.ready();
 
         function enviar(producto) {
-            // Envía el dato seleccionado al chat y cierra la app
+            // Envía el dato puro al bot y cierra la app
             tg.sendData(producto);
             tg.close();
         }
