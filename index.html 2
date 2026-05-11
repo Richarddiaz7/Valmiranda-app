@@ -3,9 +3,9 @@
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-<body>
+<body style="text-align: center; padding-top: 50px;">
     <button onclick="Telegram.WebApp.sendData('EXITO'); Telegram.WebApp.close();" 
-            style="padding: 20px; font-size: 20px;">
+            style="padding: 20px; font-size: 20px; background-color: #2ecc71; color: white; border-radius: 10px;">
         PROBAR CONEXIÓN
     </button>
 </body>
