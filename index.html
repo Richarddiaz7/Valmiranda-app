@@ -20,15 +20,12 @@
     <div class="card"><span>Tomate (1kg) - 60bs</span><button onclick="enviarPedido('Tomate')">Añadir</button></div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        function enviarPedido(producto) {
-            // Enviamos el dato puro al bot
-            tg.sendData(producto);
-            // Cerramos la app para ver el resultado en el chat
-            tg.close();
-        }
-    </script>
-</body>
-</html>
+    function pedir(item) {
+        // Esta línea es la que hace que el Bot reciba el texto
+        tg.sendData(item); 
+        tg.close();
+    }
+</script>
