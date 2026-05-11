@@ -3,32 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda App</title>
+    <title>Valmiranda Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 20px; text-align: center; }
-        .card { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; cursor: pointer; }
-        button { background: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; pointer-events: none; }
+        :root { --p-color: #2ecc71; --bg-color: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--tg-theme-bg-color, var(--bg-color)); color: var(--tg-theme-text-color, #333); margin: 0; padding: 15px; }
+        .header { text-align: center; padding: 10px; color: var(--p-color); }
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card { background: var(--tg-theme-secondary-bg-color, #fff); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .card h3 { margin: 10px 0 5px; font-size: 16px; }
+        .btn-add { background: var(--p-color); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; }
+        .cart-summary { margin-top: 20px; padding: 15px; background: #eee; border-radius: 12px; color: #333; }
     </style>
 </head>
 <body>
-    <h1>🍏 Bodega Valmiranda</h1>
-    <p>Selecciona un producto:</p>
+    <div class="header"><h1>🍏 Valmiranda POS</h1></div>
+    
+    <div class="product-grid">
+        <div class="card"><h3>Papa</h3><p>1.50$</p><button class="btn-add" onclick="agregar('Papa', 1.50)">Añadir</button></div>
+        <div class="card"><h3>Cebolla</h3><p>2.00$</p><button class="btn-add" onclick="agregar('Cebolla', 2.00)">Añadir</button></div>
+        <div class="card"><h3>Tomate</h3><p>2.50$</p><button class="btn-add" onclick="agregar('Tomate', 2.50)">Añadir</button></div>
+        <div class="card"><h3>Ajo</h3><p>0.50$</p><button class="btn-add" onclick="agregar('Ajo', 0.50)">Añadir</button></div>
+    </div>
 
-    <div class="card" onclick="enviar('Papa')"><span>Papa</span><button>Añadir</button></div>
-    <div class="card" onclick="enviar('Cebolla')"><span>Cebolla</span><button>Añadir</button></div>
-    <div class="card" onclick="enviar('Tomate')"><span>Tomate</span><button>Añadir</button></div>
+    <div class="cart-summary" id="resumen">
+        <strong>🛒 Carrito:</strong> <span id="items-count">0</span> productos<br>
+        <strong>Total:</strong> <span id="total-price">0.00</span>$
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
+        let carrito = [];
+        let total = 0;
 
-        function enviar(producto) {
-            // Envía el dato y cierra la app para volver al chat
-            tg.sendData(producto);
-            tg.close();
+        function agregar(nombre, precio) {
+            carrito.push(nombre);
+            total += precio;
+            document.getElementById('items-count').innerText = carrito.length;
+            document.getElementById('total-price').innerText = total.toFixed(2);
+            
+            // Habilitamos el botón principal de Telegram para pagar
+            tg.MainButton.text = "FINALIZAR PEDIDO (" + total.toFixed(2) + "$)";
+            tg.MainButton.show();
         }
+
+        tg.onEvent('mainButtonClicked', function() {
+            // Enviamos todo el carrito como un texto al bot
+            const datosPedido = "PEDIDO:" + carrito.join(",");
+            tg.sendData(datosPedido);
+        });
     </script>
 </body>
 </html>
