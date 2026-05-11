@@ -3,50 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda Mini App</title>
-    <!-- Script esencial de Telegram -->
+    <title>Bodega Valmiranda</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: var(--tg-theme-button-color, #248bed);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 20px; text-align: center; }
+        .card { background: var(--tg-theme-secondary-bg-color); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; }
+        h1 { color: #f39c12; }
+        button { background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>Panel de Control</h1>
-    <p>Hola, <span id="user-name">Usuario</span></p>
-    <button id="main-button">Enviar saludo al bot</button>
+    <h1>🍏 Bodega Valmiranda</h1>
+    <p>Selecciona tus productos:</p>
+
+    <div class="card">
+        <span>Papa (1kg) - 40bs</span>
+        <button onclick="pedir('Papa')">Añadir</button>
+    </div>
+    <div class="card">
+        <span>Cebolla (1kg) - 50bs</span>
+        <button onclick="pedir('Cebolla')">Añadir</button>
+    </div>
+    <div class="card">
+        <span>Tomate (1kg) - 60bs</span>
+        <button onclick="pedir('Tomate')">Añadir</button>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Expandir la app
+        tg.expand();
+        tg.MainButton.setText("VER PEDIDO");
+        tg.MainButton.show();
 
-        // Mostrar el nombre del usuario de Telegram
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name;
+        function pedir(item) {
+            tg.sendData("Pedido: " + item);
+            tg.close();
         }
-
-        // Configurar el botón principal
-        const btn = document.getElementById('main-button');
-        btn.addEventListener('click', () => {
-            tg.sendData("Hola desde la Mini App"); // Esto lo recibe tu bot de Python
-        });
     </script>
 </body>
 </html>
