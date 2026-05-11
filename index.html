@@ -6,26 +6,38 @@
     <title>Bodega Valmiranda</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); padding: 20px; text-align: center; }
+        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 20px; text-align: center; }
         .card { background: var(--tg-theme-secondary-bg-color); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; }
+        h1 { color: #f39c12; }
         button { background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>🍏 Bodega Valmiranda</h1>
-    <p>Toca un producto para enviarlo al chat:</p>
+    <p>Selecciona tus productos:</p>
 
-    <div class="card"><span>Papa (1kg) - 40bs</span><button onclick="enviarPedido('Papa')">Añadir</button></div>
-    <div class="card"><span>Cebolla (1kg) - 50bs</span><button onclick="enviarPedido('Cebolla')">Añadir</button></div>
-    <div class="card"><span>Tomate (1kg) - 60bs</span><button onclick="enviarPedido('Tomate')">Añadir</button></div>
+    <div class="card">
+        <span>Papa (1kg) - 40bs</span>
+        <button onclick="pedir('Papa')">Añadir</button>
+    </div>
+    <div class="card">
+        <span>Cebolla (1kg) - 50bs</span>
+        <button onclick="pedir('Cebolla')">Añadir</button>
+    </div>
+    <div class="card">
+        <span>Tomate (1kg) - 60bs</span>
+        <button onclick="pedir('Tomate')">Añadir</button>
+    </div>
 
     <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    function pedir(item) {
-        // Esta línea es la que hace que el Bot reciba el texto
-        tg.sendData(item); 
-        tg.close();
-    }
-</script>
+        function pedir(item) {
+            // Esta función envía el dato al bot de Termux
+            tg.sendData(item);
+            tg.close();
+        }
+    </script>
+</body>
+</html>
