@@ -1,42 +1,26 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 20px; text-align: center; }
-        .card { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; cursor: pointer; }
-        button { background: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; pointer-events: none; }
+        body { font-family: sans-serif; text-align: center; background-color: #f0f0f0; padding: 20px; }
+        .card { background: white; border-radius: 10px; padding: 15px; margin: 10px 0; border: 1px solid #ccc; cursor: pointer; }
     </style>
 </head>
 <body>
     <h1>🍏 Valmiranda POS</h1>
-    <div class="card" onclick="seleccionar('Papa')"><span>Papa</span><button>Elegir</button></div>
-    <div class="card" onclick="seleccionar('Cebolla')"><span>Cebolla</span><button>Elegir</button></div>
-    <div class="card" onclick="seleccionar('Tomate')"><span>Tomate</span><button>Elegir</button></div>
+    <div class="card" onclick="enviar('Papa')">🛒 Papa</div>
+    <div class="card" onclick="enviar('Cebolla')">🛒 Cebolla</div>
+    <div class="card" onclick="enviar('Tomate')">🛒 Tomate</div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready(); // CRÍTICO: Avisa a Telegram que la app está lista
-
-        let itemSeleccionado = "";
-
-        function seleccionar(nombre) {
-            itemSeleccionado = nombre;
-            tg.MainButton.text = "CONFIRMAR PEDIDO: " + nombre;
-            tg.MainButton.textColor = "#FFFFFF";
-            tg.MainButton.color = "#2ecc71";
-            tg.MainButton.show();
-        }
-
-        tg.onEvent('mainButtonClicked', function() {
-            // Enviamos el dato puro
-            tg.sendData(itemSeleccionado);
+        function enviar(producto) {
+            tg.sendData(producto);
             tg.close();
-        });
+        }
     </script>
 </body>
 </html>
