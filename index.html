@@ -3,72 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda POS Premium</title>
+    <title>Valmiranda Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --p-color: #27ae60; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #2c3e50; }
-        .header { text-align: center; padding: 10px 0; border-bottom: 2px solid var(--p-color); margin-bottom: 20px; font-weight: bold; }
+        :root { --p-color: #27ae60; --s-color: #2c3e50; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--s-color); overflow-x: hidden; }
+        .header { background: var(--p-color); color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; }
         
+        .page { display: none; padding: 15px; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         /* Dashboard */
-        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border-left: 5px solid var(--p-color); }
-        .stat-card span { font-size: 11px; color: #7f8c8d; text-transform: uppercase; font-weight: bold; }
-        .stat-card h2 { margin: 8px 0 0; font-size: 20px; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stat-card h2 { margin: 5px 0; color: var(--p-color); font-size: 1.4rem; }
 
-        /* Módulos Internos */
-        .modulo { display: none; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .modulo.active { display: block; }
+        /* Listas y Tarjetas */
+        .item-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .btn-add { background: var(--p-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; }
         
-        .producto-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .producto-item:active { background: #f0f0f0; }
+        /* Botones de Navegación */
+        .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-main { background: var(--p-color); color: white; }
+        .btn-sec { background: var(--s-color); color: white; }
+        .btn-back { background: #95a5a6; color: white; margin-top: 20px; }
 
-        .btn-action { width: 100%; background: var(--p-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
-        .btn-back { background: #95a5a6; margin-top: 20px; }
+        /* Carrito flotante */
+        #cart-bar { position: fixed; bottom: 0; width: 100%; background: white; border-top: 2px solid var(--p-color); padding: 15px; box-sizing: border-box; display: none; }
     </style>
 </head>
 <body>
+    <div class="header">BODEGA VALMIRANDA C.A.</div>
 
-    <div id="vista-home" class="modulo active">
-        <div class="header">📊 BODEGA VALMIRANDA C.A.</div>
-        <div class="stats-container">
+    <div id="page-home" class="page active">
+        <div class="stats">
             <div class="stat-card"><span>Ventas Hoy</span><h2 id="v-hoy">0.00$</h2></div>
-            <div class="stat-card" style="border-left-color: #e67e22;"><span>Ganancia</span><h2 id="g-neta" style="color: #e67e22;">0.00$</h2></div>
-            <div class="stat-card" style="border-left-color: #3498db;"><span>Total Items</span><h2 id="t-prod" style="color: #3498db;">0</h2></div>
-            <div class="stat-card" style="border-left-color: #e74c3c;"><span>Stock Bajo</span><h2 id="s-bajo" style="color: #e74c3c;">0</h2></div>
+            <div class="stat-card"><span>Ganancia</span><h2 id="g-neta">0.00$</h2></div>
         </div>
-        <button class="btn-action" onclick="navegar('vista-ventas')">🛒 NUEVA VENTA</button>
-        <button class="btn-action" style="background:#2c3e50;" onclick="enviarAlBot('INVENTARIO')">📦 VER ALMACÉN</button>
+        <button class="nav-btn btn-main" onclick="showPage('page-sales')">🛒 NUEVA VENTA</button>
+        <button class="nav-btn btn-sec" onclick="showPage('page-inv')">📦 VER INVENTARIO</button>
+        <button class="nav-btn btn-sec" style="background:#8e44ad;" onclick="showPage('page-admin')">⚙️ GESTIÓN / ALMACÉN</button>
     </div>
 
-    <div id="vista-ventas" class="modulo">
-        <h3 style="margin-top:0;">🛒 Seleccione Producto</h3>
-        <p style="font-size: 12px; color: #666;">Seleccione para facturar en el chat:</p>
-        <div class="producto-item" onclick="enviarAlBot('VENTA:Papa')"><span>🥔 Papa</span> <span>➕</span></div>
-        <div class="producto-item" onclick="enviarAlBot('VENTA:Cebolla')"><span>🧅 Cebolla</span> <span>➕</span></div>
-        <div class="producto-item" onclick="enviarAlBot('VENTA:Tomate')"><span>🍅 Tomate</span> <span>➕</span></div>
-        <div class="producto-item" onclick="enviarAlBot('VENTA:Ajo')"><span>🧄 Ajo</span> <span>➕</span></div>
-        <button class="btn-action btn-back" onclick="navegar('vista-home')">⬅ VOLVER</button>
+    <div id="page-sales" class="page">
+        <h3>🛒 Carrito de Compras</h3>
+        <div id="sales-list">
+            <div class="item-card"><span>🥔 Papa (1kg)</span><button class="btn-add" onclick="addToCart('Papa')">+</button></div>
+            <div class="item-card"><span>🧅 Cebolla (1kg)</span><button class="btn-add" onclick="addToCart('Cebolla')">+</button></div>
+            <div class="item-card"><span>🍅 Tomate (1kg)</span><button class="btn-add" onclick="addToCart('Tomate')">+</button></div>
+        </div>
+        <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
+    </div>
+
+    <div id="page-inv" class="page">
+        <h3>📦 Stock Actual</h3>
+        <div id="inv-display">Cargando productos...</div>
+        <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
+    </div>
+
+    <div id="page-admin" class="page">
+        <h3>⚙️ Administración</h3>
+        <button class="nav-btn btn-main" onclick="action('STOCK')">📦 CARGAR STOCK</button>
+        <button class="nav-btn btn-main" style="background:#d35400;" onclick="action('PRECIO')">💵 EDITAR PRECIOS</button>
+        <button class="nav-btn btn-main" style="background:#c0392b;" onclick="action('BORRAR')">❌ ELIMINAR PRODUCTO</button>
+        <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
+    </div>
+
+    <div id="cart-bar">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>Items: <b id="cart-count">0</b></span>
+            <span>Total: <b id="cart-total">0.00$</b></span>
+        </div>
+        <button class="nav-btn btn-main" onclick="finishSale()">🧾 FINALIZAR Y COBRAR</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Cargar datos reales desde la URL que envía el Bot
+        let cart = [];
         const params = new URLSearchParams(window.location.search);
         document.getElementById('v-hoy').innerText = (params.get('v') || '0.00') + "$";
         document.getElementById('g-neta').innerText = (params.get('g') || '0.00') + "$";
-        document.getElementById('t-prod').innerText = params.get('t') || '0';
-        document.getElementById('s-bajo').innerText = params.get('b') || '0';
 
-        function navegar(id) {
-            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active'));
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if(id !== 'page-sales') document.getElementById('cart-bar').style.display = 'none';
         }
 
-        function enviarAlBot(comando) {
-            tg.sendData(comando);
+        function addToCart(item) {
+            cart.push(item);
+            document.getElementById('cart-bar').style.display = 'block';
+            document.getElementById('cart-count').innerText = cart.length;
+            // Aquí podrías sumar precios reales si los pasas por la URL
+        }
+
+        function finishSale() {
+            tg.sendData("VENTA_MULTIPLE:" + cart.join(","));
+            tg.close();
+        }
+
+        function action(type) {
+            tg.sendData("ADMIN:" + type);
             tg.close();
         }
     </script>
