@@ -29,16 +29,13 @@
         <button onclick="pedir('Tomate')">Añadir</button>
     </div>
 
-    <script>
+        <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.MainButton.setText("VER PEDIDO");
-        tg.MainButton.show();
 
         function pedir(item) {
+            // Esta línea envía el texto al bot y cierra la ventana
             tg.sendData("Pedido: " + item);
             tg.close();
         }
-    </script>
-</body>
-</html>
+        </script>
