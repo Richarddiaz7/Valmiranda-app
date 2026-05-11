@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bodega Valmiranda</title>
+    <title>Valmiranda App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); padding: 20px; text-align: center; }
+        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 20px; text-align: center; }
         .card { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; cursor: pointer; }
         button { background: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; pointer-events: none; }
     </style>
@@ -20,11 +20,15 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready(); // CRÍTICO: Avisa a Telegram que la app está lista
+
         let itemSeleccionado = "";
 
         function seleccionar(nombre) {
             itemSeleccionado = nombre;
-            tg.MainButton.text = "CONFIRMAR: " + nombre;
+            tg.MainButton.text = "CONFIRMAR PEDIDO: " + nombre;
+            tg.MainButton.textColor = "#FFFFFF";
+            tg.MainButton.color = "#2ecc71";
             tg.MainButton.show();
         }
 
