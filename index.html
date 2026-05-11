@@ -6,59 +6,69 @@
     <title>Valmiranda POS</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --p-color: #27ae60; --bg: #f8f9fa; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        :root { --p-color: #27ae60; --s-color: #2c3e50; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; color: var(--s-color); }
         .header { text-align: center; padding: 10px 0; border-bottom: 2px solid var(--p-color); margin-bottom: 20px; font-weight: bold; }
+        
+        /* Dashboard */
         .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stat-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border-left: 5px solid var(--p-color); }
-        .stat-card h2 { margin: 8px 0 0; font-size: 20px; color: #2c3e50; }
+        .stat-card span { font-size: 11px; color: #7f8c8d; text-transform: uppercase; font-weight: bold; }
+        .stat-card h2 { margin: 8px 0 0; font-size: 20px; }
+
+        /* Módulos Internos */
+        .modulo { display: none; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .modulo.active { display: block; }
         
-        /* Sección de Ventas Interna */
-        #seccion-ventas { display: none; background: white; border-radius: 15px; padding: 15px; margin-top: 20px; }
-        .producto-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
-        .btn-action { width: 100%; background: var(--p-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .producto-item { display: flex; justify-content: space-between; padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
+        .producto-item:active { background: #f0f0f0; }
+
+        .btn-action { width: 100%; background: var(--p-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-back { background: #95a5a6; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div id="main-dashboard">
+
+    <div id="vista-home" class="modulo active">
         <div class="header">📊 BODEGA VALMIRANDA ADMIN</div>
         <div class="stats-container">
-            <div class="stat-card"><span>Ventas</span><h2 id="v-hoy">0.00$</h2></div>
-            <div class="stat-card" style="border-left-color: #e67e22;"><span>Ganancia</span><h2 id="g-neta">0.00$</h2></div>
+            <div class="stat-card"><span>Ventas Hoy</span><h2 id="v-hoy">0.00$</h2></div>
+            <div class="stat-card" style="border-left-color: #e67e22;"><span>Ganancia</span><h2 id="g-neta" style="color: #e67e22;">0.00$</h2></div>
+            <div class="stat-card" style="border-left-color: #3498db;"><span>Items</span><h2 id="t-prod" style="color: #3498db;">0</h2></div>
+            <div class="stat-card" style="border-left-color: #e74c3c;"><span>Stock Bajo</span><h2 id="s-bajo" style="color: #e74c3c;">0</h2></div>
         </div>
-        <button class="btn-action" onclick="abrirVentas()">🛒 NUEVA VENTA</button>
-        <button class="btn-action" style="background:#2c3e50;" onclick="tg.sendData('INVENTARIO')">📦 VER ALMACÉN</button>
+        <button class="btn-action" onclick="navegar('vista-ventas')">🛒 NUEVA VENTA</button>
+        <button class="btn-action" style="background:#2c3e50;" onclick="enviarAlBot('INVENTARIO')">📦 VER ALMACÉN</button>
     </div>
 
-    <div id="seccion-ventas">
-        <button onclick="cerrarVentas()" style="float:right; border:none; background:none; color:red;">✖</button>
-        <h3>Seleccione Producto</h3>
-        <div class="producto-item" onclick="seleccionar('Papa')"><span>🥔 Papa</span> <span>➕</span></div>
-        <div class="producto-item" onclick="seleccionar('Cebolla')"><span>🧅 Cebolla</span> <span>➕</span></div>
-        <div class="producto-item" onclick="seleccionar('Tomate')"><span>🍅 Tomate</span> <span>➕</span></div>
+    <div id="vista-ventas" class="modulo">
+        <h3 style="margin-top:0;">🛒 Seleccione Producto</h3>
+        <p style="font-size: 12px; color: #666;">Toque para cargar al carrito del bot:</p>
+        <div class="producto-item" onclick="enviarAlBot('VENTA:Papa')"><span>🥔 Papa</span> <span>➕</span></div>
+        <div class="producto-item" onclick="enviarAlBot('VENTA:Cebolla')"><span>🧅 Cebolla</span> <span>➕</span></div>
+        <div class="producto-item" onclick="enviarAlBot('VENTA:Tomate')"><span>🍅 Tomate</span> <span>➕</span></div>
+        <div class="producto-item" onclick="enviarAlBot('VENTA:Ajo')"><span>🧄 Ajo</span> <span>➕</span></div>
+        <button class="btn-action btn-back" onclick="navegar('vista-home')">⬅ VOLVER</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
+        // Cargar datos reales desde la URL
         const params = new URLSearchParams(window.location.search);
         document.getElementById('v-hoy').innerText = (params.get('v') || '0.00') + "$";
         document.getElementById('g-neta').innerText = (params.get('g') || '0.00') + "$";
+        document.getElementById('t-prod').innerText = params.get('t') || '0';
+        document.getElementById('s-bajo').innerText = params.get('b') || '0';
 
-        function abrirVentas() {
-            document.getElementById('main-dashboard').style.display = 'none';
-            document.getElementById('seccion-ventas').style.display = 'block';
+        function navegar(idVista) {
+            document.querySelectorAll('.modulo').forEach(m => m.classList.remove('active'));
+            document.getElementById(idVista).classList.add('active');
         }
 
-        function cerrarVentas() {
-            document.getElementById('main-dashboard').style.display = 'block';
-            document.getElementById('seccion-ventas').style.display = 'none';
-        }
-
-        function seleccionar(item) {
-            // Al tocar el producto, se lo mandamos al bot para que pida la cantidad
-            tg.sendData("VENTA:" + item);
+        function enviarAlBot(comando) {
+            tg.sendData(comando);
             tg.close();
         }
     </script>
