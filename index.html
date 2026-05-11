@@ -3,32 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda App</title>
+    <title>Valmiranda Dashboard</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 20px; text-align: center; }
-        .card { background: var(--tg-theme-secondary-bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; cursor: pointer; }
-        button { background: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; pointer-events: none; }
+        :root { --p-color: #27ae60; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .header { text-align: center; padding: 10px 0; border-bottom: 2px solid var(--p-color); margin-bottom: 20px; }
+        
+        /* Dashboard Estilo FINA */
+        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; border-left: 5px solid var(--p-color); }
+        .stat-card span { font-size: 11px; color: #7f8c8d; text-transform: uppercase; font-weight: bold; }
+        .stat-card h2 { margin: 8px 0 0; font-size: 20px; color: #2c3e50; }
+
+        .btn-action { width: 100%; background: var(--p-color); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>🍏 Valmiranda POS</h1>
-    <p>Seleccione un producto para el carrito:</p>
+    <div class="header">🚀 VALMIRANDA C.A. ADMIN</div>
 
-    <div class="card" onclick="enviar('Papa')"><span>Papa</span><button>Elegir</button></div>
-    <div class="card" onclick="enviar('Cebolla')"><span>Cebolla</span><button>Elegir</button></div>
-    <div class="card" onclick="enviar('Tomate')"><span>Tomate</span><button>Elegir</button></div>
+    <div class="stats-container">
+        <div class="stat-card">
+            <span>Ventas (Hoy)</span>
+            <h2 id="ventas-hoy">Cargando...</h2>
+        </div>
+        <div class="stat-card" style="border-left-color: #e67e22;">
+            <span>Ganancia Bruta</span>
+            <h2 id="ganancia-neta" style="color: #e67e22;">Cargando...</h2>
+        </div>
+        <div class="stat-card" style="border-left-color: #3498db;">
+            <span>Productos</span>
+            <h2 id="total-productos" style="color: #3498db;">--</h2>
+        </div>
+        <div class="stat-card" style="border-left-color: #e74c3c;">
+            <span>Stock Bajo</span>
+            <h2 id="stock-bajo" style="color: #e74c3c;">0</h2>
+        </div>
+    </div>
+
+    <button class="btn-action" onclick="enviarComando('VENDER')">🛒 NUEVA VENTA</button>
+    <button class="btn-action" style="background:#2c3e50;" onclick="enviarComando('INVENTARIO')">📦 VER ALMACÉN</button>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
-        function enviar(producto) {
-            // Envía el dato puro al bot y cierra la app
-            tg.sendData(producto);
+        // Al abrir la app, pedimos los datos al bot para actualizar el Dashboard
+        function solicitarDatos() {
+            // Simulamos la carga por ahora. En el siguiente paso 
+            // haremos que el bot los envíe automáticamente.
+            document.getElementById('ventas-hoy').innerText = "0.00$";
+            document.getElementById('ganancia-neta').innerText = "0.00$";
+        }
+
+        function enviarComando(cmd) {
+            tg.sendData(cmd);
             tg.close();
         }
+
+        solicitarDatos();
     </script>
 </body>
 </html>
