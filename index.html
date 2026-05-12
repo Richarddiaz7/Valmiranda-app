@@ -14,7 +14,8 @@
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stat-card { background: white; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; }
-        .item-card { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; }
+        .item-card { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .btn-add { background: var(--p-color); color: white; border: none; padding: 5px 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -30,15 +31,14 @@
     </div>
 
     <div id="page-sales" class="page">
-        <h3>🛒 Productos</h3>
-        <div class="item-card" onclick="enviar('VENTA:Papa')"><span>🥔 Papa</span> <span>➕</span></div>
-        <div class="item-card" onclick="enviar('VENTA:Cebolla')"><span>🧅 Cebolla</span> <span>➕</span></div>
+        <h3>🛒 Productos para Venta</h3>
+        <div id="sales-list">Cargando productos...</div>
         <button class="nav-btn" style="background:#95a5a6; margin-top:20px;" onclick="showPage('page-home')">⬅ VOLVER</button>
     </div>
 
     <div id="page-inv" class="page">
         <h3>📦 Stock en Almacén</h3>
-        <div id="inv-lista">Cargando inventario...</div>
+        <div id="inv-list">Cargando inventario...</div>
         <button class="nav-btn" style="background:#95a5a6; margin-top:20px;" onclick="showPage('page-home')">⬅ VOLVER</button>
     </div>
 
@@ -50,14 +50,18 @@
         document.getElementById('v-hoy').innerText = (params.get('v') || '0.00') + "$";
         document.getElementById('g-neta').innerText = (params.get('g') || '0.00') + "$";
 
-        // Pintamos el inventario si el bot lo envió por la URL
         const invRaw = params.get('inv');
         if (invRaw) {
-            const lista = document.getElementById('inv-lista');
-            lista.innerHTML = "";
+            const invList = document.getElementById('inv-list');
+            const salesList = document.getElementById('sales-list');
+            invList.innerHTML = ""; salesList.innerHTML = "";
+            
             invRaw.split(",").forEach(p => {
-                const [nom, stk] = p.split(":");
-                lista.innerHTML += `<div class="item-card"><span>${nom}</span> <b>${stk} disp.</b></div>`;
+                const [nom, stk, prc] = p.split(":");
+                // Llenar Inventario
+                invList.innerHTML += `<div class="item-card"><span>${nom}</span> <b>${stk} disp.</b></div>`;
+                // Llenar Ventas
+                salesList.innerHTML += `<div class="item-card"><span>${nom} (${prc}$)</span> <button class="btn-add" onclick="enviar('VENTA:${nom}')">+</button></div>`;
             });
         }
 
