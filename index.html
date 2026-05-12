@@ -106,15 +106,6 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .btn-manual {
-            background: #ff9800;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-        }
         .carrito {
             position: fixed;
             bottom: 0;
@@ -200,6 +191,20 @@
             border: 1px solid #ddd;
             border-radius: 8px;
         }
+        .btn-manual-flotante {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 100;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -232,7 +237,6 @@
         <div class="tasa-info" id="tasaInfo"></div>
     </div>
 
-    <!-- Modal para peso manual -->
     <div id="modalManual" class="modal">
         <div class="modal-content">
             <h3>💰 Ingrese el monto en Bs</h3>
@@ -244,12 +248,13 @@
         </div>
     </div>
 
+    <button class="btn-manual-flotante" onclick="abrirModalManual()">➕ Peso manual</button>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
 
-        // Parámetros URL
         const urlParams = new URLSearchParams(window.location.search);
         let ventasHoy = parseFloat(urlParams.get('v')) || 0;
         let tasa = parseFloat(urlParams.get('tasa')) || 60;
@@ -258,21 +263,17 @@
         document.getElementById('tasaDisplay').innerHTML = `${tasa.toFixed(0)}`;
         document.getElementById('tasaInfo').innerHTML = `💵 1 USD = ${tasa.toFixed(2)} Bs`;
 
-        // Lista de productos (se pueden editar)
         const productos = [
-            // VERDURAS (peso en kg o g)
-            { id: 1, nombre: '🥔 Papa', precio_usd: 2.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 2.00*tasa },
-            { id: 2, nombre: '🧅 Cebolla', precio_usd: 1.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 1.50*tasa },
-            { id: 3, nombre: '🍅 Tomate', precio_usd: 2.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 2.50*tasa },
-            { id: 4, nombre: '🥬 Lechuga', precio_usd: 1.20, categoria: 'verdura', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.20*tasa },
-            { id: 5, nombre: '🥕 Zanahoria', precio_usd: 1.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 1.00*tasa },
-            // FRUTAS
-            { id: 6, nombre: '🍌 Cambur', precio_usd: 1.20, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg', precio_bs: 1.20*tasa },
-            { id: 7, nombre: '🍎 Manzana', precio_usd: 3.00, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg', precio_bs: 3.00*tasa },
-            // VÍVERES
-            { id: 8, nombre: '🍚 Arroz 1kg', precio_usd: 1.80, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.80*tasa },
-            { id: 9, nombre: '🍬 Azúcar 1kg', precio_usd: 1.20, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.20*tasa },
-            { id: 10, nombre: '🥛 Leche 1L', precio_usd: 1.50, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.50*tasa }
+            { id: 1, nombre: '🥔 Papa', precio_usd: 2.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
+            { id: 2, nombre: '🧅 Cebolla', precio_usd: 1.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
+            { id: 3, nombre: '🍅 Tomate', precio_usd: 2.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
+            { id: 4, nombre: '🥬 Lechuga', precio_usd: 1.20, categoria: 'verdura', tipo: 'unidad', unidad_base: 'unidad' },
+            { id: 5, nombre: '🥕 Zanahoria', precio_usd: 1.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
+            { id: 6, nombre: '🍌 Cambur', precio_usd: 1.20, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg' },
+            { id: 7, nombre: '🍎 Manzana', precio_usd: 3.00, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg' },
+            { id: 8, nombre: '🍚 Arroz 1kg', precio_usd: 1.80, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad' },
+            { id: 9, nombre: '🍬 Azúcar 1kg', precio_usd: 1.20, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad' },
+            { id: 10, nombre: '🥛 Leche 1L', precio_usd: 1.50, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad' }
         ];
 
         let carrito = [];
@@ -317,20 +318,17 @@
             let cantidad = parseFloat(document.getElementById(`cant-${id}`).value);
             if (isNaN(cantidad) || cantidad <= 0) cantidad = 1;
             let unidad = producto.unidad_base;
-            let multiplicador = 1;
             if (producto.tipo === 'peso') {
                 const unidadSelect = document.getElementById(`unidad-${id}`);
                 if (unidadSelect && unidadSelect.value === 'g') {
-                    cantidad = cantidad / 1000; // convertir gramos a kg
+                    cantidad = cantidad / 1000; // gramos a kg
                     unidad = 'g';
-                    multiplicador = 1000;
                 } else {
                     unidad = 'kg';
                 }
             }
-            // Calcular precio
-            let precio_usd_item = producto.precio_usd * cantidad;
-            let precio_bs_item = precio_usd_item * tasa;
+            const precio_usd_item = producto.precio_usd * cantidad;
+            const precio_bs_item = precio_usd_item * tasa;
             carrito.push({
                 id: producto.id,
                 nombre: producto.nombre,
@@ -418,7 +416,6 @@
                 tg.showAlert('Carrito vacío');
                 return;
             }
-            // Preparar datos para enviar al bot
             const productosParaEnviar = carrito.map(item => ({
                 nombre: item.nombre,
                 cantidad: item.cantidad,
@@ -434,7 +431,6 @@
             tg.close();
         }
 
-        // Categorías
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -442,23 +438,6 @@
                 renderizarProductos(btn.dataset.cat);
             });
         });
-
-        // Botón flotante para añadir manual (opcional)
-        const btnManualGlobal = document.createElement('button');
-        btnManualGlobal.innerText = '➕ Añadir por peso manual';
-        btnManualGlobal.style.position = 'fixed';
-        btnManualGlobal.style.bottom = '80px';
-        btnManualGlobal.style.right = '16px';
-        btnManualGlobal.style.background = '#ff9800';
-        btnManualGlobal.style.color = 'white';
-        btnManualGlobal.style.border = 'none';
-        btnManualGlobal.style.padding = '10px 16px';
-        btnManualGlobal.style.borderRadius = '30px';
-        btnManualGlobal.style.fontWeight = 'bold';
-        btnManualGlobal.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
-        btnManualGlobal.style.zIndex = '100';
-        btnManualGlobal.onclick = abrirModalManual;
-        document.body.appendChild(btnManualGlobal);
 
         renderizarProductos();
     </script>
