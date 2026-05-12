@@ -6,179 +6,115 @@
     <title>Valmiranda - Víveres y Frutas</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f0f2f5;
             padding: 16px;
-            padding-bottom: 140px;
+            padding-bottom: 160px;
         }
-
-        /* Encabezado */
         .header {
             background: linear-gradient(135deg, #27ae60, #219a52);
             color: white;
-            padding: 20px;
+            padding: 16px;
             border-radius: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
-        .header h1 {
-            font-size: 22px;
-            margin-bottom: 8px;
-        }
-
         .stats {
             display: flex;
             justify-content: space-between;
             margin-top: 12px;
-            gap: 12px;
+            gap: 10px;
         }
-
         .stat {
             background: rgba(255,255,255,0.2);
-            padding: 8px 12px;
+            padding: 8px;
             border-radius: 10px;
             flex: 1;
+            font-size: 14px;
         }
-
-        /* Categorías */
         .categorias {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 16px;
             overflow-x: auto;
             padding-bottom: 8px;
         }
-
         .cat-btn {
             background: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 25px;
             font-weight: bold;
-            color: #2c3e50;
             cursor: pointer;
             white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .cat-btn.active {
             background: #27ae60;
             color: white;
         }
-
-        /* Productos */
         .producto {
             background: white;
             border-radius: 16px;
-            padding: 16px;
+            padding: 12px;
             margin-bottom: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
         .producto-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
-
-        .producto-nombre {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .producto-precio {
-            color: #27ae60;
-            font-weight: bold;
-        }
-
-        .precio-usd {
-            font-size: 18px;
-        }
-
-        .precio-bs {
-            font-size: 12px;
-            color: #7f8c8d;
-        }
-
+        .producto-nombre { font-size: 16px; font-weight: bold; }
+        .precio-usd { font-size: 14px; color: #27ae60; font-weight: bold; }
+        .precio-bs { font-size: 12px; color: #7f8c8d; }
         .producto-control {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
             flex-wrap: wrap;
-            gap: 10px;
         }
-
-        .control-cantidad {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #f0f2f5;
-            padding: 8px 12px;
-            border-radius: 30px;
-        }
-
-        .control-cantidad button {
-            background: #27ae60;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .control-cantidad span {
-            font-weight: bold;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        .control-peso {
+        .control-group {
             display: flex;
             align-items: center;
             gap: 8px;
             background: #f0f2f5;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 30px;
         }
-
-        .control-peso input {
-            width: 70px;
-            padding: 8px;
+        .control-group input {
+            width: 60px;
+            padding: 6px;
             border: 1px solid #ddd;
             border-radius: 8px;
             text-align: center;
         }
-
-        .control-peso span {
-            font-size: 12px;
-            color: #7f8c8d;
+        .control-group select {
+            padding: 6px;
+            border-radius: 8px;
         }
-
         .btn-agregar {
             background: #27ae60;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 25px;
             font-weight: bold;
             cursor: pointer;
         }
-
-        /* Carrito */
+        .btn-manual {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+        }
         .carrito {
             position: fixed;
             bottom: 0;
@@ -186,66 +122,92 @@
             right: 0;
             background: white;
             border-top: 3px solid #27ae60;
-            padding: 16px;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
-            border-radius: 20px 20px 0 0;
-        }
-
-        .carrito-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-weight: bold;
-        }
-
-        .carrito-items {
-            max-height: 200px;
+            padding: 12px;
+            max-height: 70vh;
             overflow-y: auto;
-            margin-bottom: 12px;
-            font-size: 14px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
         }
-
         .carrito-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
+            align-items: center;
+            padding: 8px 0;
             border-bottom: 1px solid #ecf0f1;
         }
-
+        .carrito-item-info {
+            flex: 1;
+            font-size: 14px;
+        }
+        .btn-eliminar {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
         .total {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            color: #27ae60;
             text-align: right;
             margin: 12px 0;
         }
-
         .btn-pagar {
             width: 100%;
             background: #27ae60;
             color: white;
             border: none;
-            padding: 14px;
+            padding: 12px;
             border-radius: 12px;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
         }
-
+        .btn-volver {
+            background: #95a5a6;
+            margin-top: 8px;
+        }
         .tasa-info {
             font-size: 12px;
-            color: #7f8c8d;
             text-align: center;
-            margin-top: 10px;
+            margin-top: 8px;
+            color: #7f8c8d;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            width: 80%;
+            max-width: 280px;
+            text-align: center;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 12px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🏪 VIVERES VALMIRANDA</h1>
+        <h2>🏪 VIVERES VALMIRANDA</h2>
         <div class="stats">
             <div class="stat">💰 Ventas hoy<br><span id="ventasHoy">$0</span></div>
-            <div class="stat">💶 Tasa Bs<br><span id="tasaDisplay">0</span></div>
+            <div class="stat">💶 Tasa<br><span id="tasaDisplay">0</span> Bs</div>
         </div>
     </div>
 
@@ -259,17 +221,27 @@
     <div id="productos"></div>
 
     <div class="carrito" id="carrito" style="display: none;">
-        <div class="carrito-header">
-            <span>🛒 CARRITO</span>
-            <span id="carritoCount">0 items</span>
-        </div>
-        <div class="carrito-items" id="carritoItems"></div>
+        <div style="font-weight: bold; margin-bottom: 8px;">🛒 CARRITO</div>
+        <div id="carritoItems"></div>
         <div class="total">
             <div>USD: $<span id="totalUSD">0.00</span></div>
             <div>Bs: <span id="totalBS">0.00</span></div>
         </div>
         <button class="btn-pagar" onclick="pagar()">✅ PAGAR AHORA</button>
+        <button class="btn-pagar btn-volver" onclick="cerrarCarrito()">⬅ VOLVER A LA TIENDA</button>
         <div class="tasa-info" id="tasaInfo"></div>
+    </div>
+
+    <!-- Modal para peso manual -->
+    <div id="modalManual" class="modal">
+        <div class="modal-content">
+            <h3>💰 Ingrese el monto en Bs</h3>
+            <input type="number" id="manualMonto" placeholder="Ej: 2500" step="any">
+            <label>Descripción:</label>
+            <input type="text" id="manualDesc" placeholder="Ej: Queso 500g">
+            <button onclick="agregarManual()" style="background:#27ae60; padding:8px; border:none; border-radius:8px; color:white;">Agregar al carrito</button>
+            <button onclick="cerrarModal()" style="background:#95a5a6; margin-top:8px; padding:8px; border:none; border-radius:8px;">Cancelar</button>
+        </div>
     </div>
 
     <script>
@@ -277,7 +249,7 @@
         tg.expand();
         tg.enableClosingConfirmation();
 
-        // Obtener parámetros de URL
+        // Parámetros URL
         const urlParams = new URLSearchParams(window.location.search);
         let ventasHoy = parseFloat(urlParams.get('v')) || 0;
         let tasa = parseFloat(urlParams.get('tasa')) || 60;
@@ -286,66 +258,53 @@
         document.getElementById('tasaDisplay').innerHTML = `${tasa.toFixed(0)}`;
         document.getElementById('tasaInfo').innerHTML = `💵 1 USD = ${tasa.toFixed(2)} Bs`;
 
-        // Productos disponibles
+        // Lista de productos (se pueden editar)
         const productos = [
-            // VERDURAS (por peso)
-            { id: 1, nombre: '🥔 Papa', precio_usd: 2.00, precio_bs: 2.00 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
-            { id: 2, nombre: '🧅 Cebolla', precio_usd: 1.50, precio_bs: 1.50 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
-            { id: 3, nombre: '🍅 Tomate', precio_usd: 2.50, precio_bs: 2.50 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
-            { id: 4, nombre: '🥬 Lechuga', precio_usd: 1.20, precio_bs: 1.20 * tasa, categoria: 'verdura', tipo: 'unidad', unidad: 'unidad' },
-            { id: 5, nombre: '🥕 Zanahoria', precio_usd: 1.00, precio_bs: 1.00 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
-            { id: 6, nombre: '🫑 Pimentón', precio_usd: 1.80, precio_bs: 1.80 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
-            
-            // FRUTAS (por peso)
-            { id: 7, nombre: '🍌 Cambur', precio_usd: 1.20, precio_bs: 1.20 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
-            { id: 8, nombre: '🍎 Manzana', precio_usd: 3.00, precio_bs: 3.00 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
-            { id: 9, nombre: '🍊 Naranja', precio_usd: 1.50, precio_bs: 1.50 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
-            { id: 10, nombre: '🍓 Fresa', precio_usd: 4.50, precio_bs: 4.50 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
-            
-            // VÍVERES (por unidad)
-            { id: 11, nombre: '🍚 Arroz 1kg', precio_usd: 1.80, precio_bs: 1.80 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
-            { id: 12, nombre: '🍬 Azúcar 1kg', precio_usd: 1.20, precio_bs: 1.20 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
-            { id: 13, nombre: '🥛 Leche 1L', precio_usd: 1.50, precio_bs: 1.50 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
-            { id: 14, nombre: '🫘 Caraotas', precio_usd: 2.00, precio_bs: 2.00 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'kg' },
-            { id: 15, nombre: '🌽 Harina Pan', precio_usd: 2.50, precio_bs: 2.50 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
-            { id: 16, nombre: '🫒 Aceite 1L', precio_usd: 3.50, precio_bs: 3.50 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' }
+            // VERDURAS (peso en kg o g)
+            { id: 1, nombre: '🥔 Papa', precio_usd: 2.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 2.00*tasa },
+            { id: 2, nombre: '🧅 Cebolla', precio_usd: 1.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 1.50*tasa },
+            { id: 3, nombre: '🍅 Tomate', precio_usd: 2.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 2.50*tasa },
+            { id: 4, nombre: '🥬 Lechuga', precio_usd: 1.20, categoria: 'verdura', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.20*tasa },
+            { id: 5, nombre: '🥕 Zanahoria', precio_usd: 1.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg', precio_bs: 1.00*tasa },
+            // FRUTAS
+            { id: 6, nombre: '🍌 Cambur', precio_usd: 1.20, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg', precio_bs: 1.20*tasa },
+            { id: 7, nombre: '🍎 Manzana', precio_usd: 3.00, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg', precio_bs: 3.00*tasa },
+            // VÍVERES
+            { id: 8, nombre: '🍚 Arroz 1kg', precio_usd: 1.80, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.80*tasa },
+            { id: 9, nombre: '🍬 Azúcar 1kg', precio_usd: 1.20, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.20*tasa },
+            { id: 10, nombre: '🥛 Leche 1L', precio_usd: 1.50, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad', precio_bs: 1.50*tasa }
         ];
 
         let carrito = [];
 
-        // Renderizar productos
         function renderizarProductos(categoria = 'todos') {
             const contenedor = document.getElementById('productos');
             contenedor.innerHTML = '';
-            
-            const filtrados = categoria === 'todos' 
-                ? productos 
-                : productos.filter(p => p.categoria === categoria);
-            
+            const filtrados = categoria === 'todos' ? productos : productos.filter(p => p.categoria === categoria);
             filtrados.forEach(p => {
                 const div = document.createElement('div');
                 div.className = 'producto';
                 div.innerHTML = `
                     <div class="producto-info">
-                        <div class="producto-nombre">${p.nombre}</div>
-                        <div class="producto-precio">
+                        <span class="producto-nombre">${p.nombre}</span>
+                        <div>
                             <div class="precio-usd">$${p.precio_usd}</div>
-                            <div class="precio-bs">Bs ${p.precio_bs.toFixed(0)}</div>
+                            <div class="precio-bs">Bs ${(p.precio_usd * tasa).toFixed(0)}</div>
                         </div>
                     </div>
                     <div class="producto-control">
-                        ${p.tipo === 'peso' ? `
-                            <div class="control-peso">
-                                <input type="number" id="peso-${p.id}" value="1" step="0.5" min="0.5">
-                                <span>${p.unidad}</span>
-                            </div>
-                        ` : `
-                            <div class="control-cantidad">
-                                <button onclick="cambiarCantidad(${p.id}, -1)">-</button>
-                                <span id="cant-${p.id}">1</span>
-                                <button onclick="cambiarCantidad(${p.id}, 1)">+</button>
-                            </div>
-                        `}
+                        <div class="control-group">
+                            ${p.tipo === 'peso' ? `
+                                <input type="number" id="cant-${p.id}" value="1" step="0.1" min="0.1">
+                                <select id="unidad-${p.id}">
+                                    <option value="kg">kg</option>
+                                    <option value="g">gramos</option>
+                                </select>
+                            ` : `
+                                <input type="number" id="cant-${p.id}" value="1" step="1" min="1" style="width:60px">
+                                <span>${p.unidad_base}</span>
+                            `}
+                        </div>
                         <button class="btn-agregar" onclick="agregarAlCarrito(${p.id})">➕ Agregar</button>
                     </div>
                 `;
@@ -353,106 +312,129 @@
             });
         }
 
-        function cambiarCantidad(id, delta) {
-            const span = document.getElementById(`cant-${id}`);
-            let actual = parseInt(span.innerText);
-            actual += delta;
-            if (actual < 1) actual = 1;
-            span.innerText = actual;
-        }
-
         function agregarAlCarrito(id) {
             const producto = productos.find(p => p.id === id);
-            let cantidad = 1;
-            
+            let cantidad = parseFloat(document.getElementById(`cant-${id}`).value);
+            if (isNaN(cantidad) || cantidad <= 0) cantidad = 1;
+            let unidad = producto.unidad_base;
+            let multiplicador = 1;
             if (producto.tipo === 'peso') {
-                const input = document.getElementById(`peso-${id}`);
-                cantidad = parseFloat(input.value);
-                if (isNaN(cantidad) || cantidad <= 0) cantidad = 1;
-            } else {
-                const span = document.getElementById(`cant-${id}`);
-                cantidad = parseInt(span.innerText);
+                const unidadSelect = document.getElementById(`unidad-${id}`);
+                if (unidadSelect && unidadSelect.value === 'g') {
+                    cantidad = cantidad / 1000; // convertir gramos a kg
+                    unidad = 'g';
+                    multiplicador = 1000;
+                } else {
+                    unidad = 'kg';
+                }
             }
-            
-            // Buscar si ya está en el carrito
-            const existente = carrito.find(item => item.id === id);
-            if (existente) {
-                existente.cantidad += cantidad;
-            } else {
-                carrito.push({
-                    id: producto.id,
-                    nombre: producto.nombre,
-                    cantidad: cantidad,
-                    precio_usd: producto.precio_usd,
-                    unidad: producto.unidad,
-                    tipo: producto.tipo
-                });
-            }
-            
+            // Calcular precio
+            let precio_usd_item = producto.precio_usd * cantidad;
+            let precio_bs_item = precio_usd_item * tasa;
+            carrito.push({
+                id: producto.id,
+                nombre: producto.nombre,
+                cantidad: cantidad,
+                unidad: unidad,
+                precio_usd: precio_usd_item,
+                precio_bs: precio_bs_item
+            });
             actualizarCarrito();
-            
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function agregarManual() {
+            const montoBs = parseFloat(document.getElementById('manualMonto').value);
+            const desc = document.getElementById('manualDesc').value.trim() || "Producto manual";
+            if (isNaN(montoBs) || montoBs <= 0) {
+                tg.showAlert("Ingrese un monto válido en Bs");
+                return;
+            }
+            const montoUsd = montoBs / tasa;
+            carrito.push({
+                id: null,
+                nombre: `📦 ${desc}`,
+                cantidad: 1,
+                unidad: 'pza',
+                precio_usd: montoUsd,
+                precio_bs: montoBs,
+                manual: true
+            });
+            cerrarModal();
+            actualizarCarrito();
         }
 
         function actualizarCarrito() {
             const carritoDiv = document.getElementById('carrito');
-            const carritoItemsDiv = document.getElementById('carritoItems');
-            const totalUSD = document.getElementById('totalUSD');
-            const totalBS = document.getElementById('totalBS');
-            const carritoCount = document.getElementById('carritoCount');
-            
+            const itemsDiv = document.getElementById('carritoItems');
+            const totalUSDspan = document.getElementById('totalUSD');
+            const totalBSspan = document.getElementById('totalBS');
             if (carrito.length === 0) {
                 carritoDiv.style.display = 'none';
                 return;
             }
-            
             carritoDiv.style.display = 'block';
-            
             let sumUSD = 0;
-            let itemsHtml = '';
-            
-            carrito.forEach((item, index) => {
-                const subtotalUSD = item.precio_usd * item.cantidad;
-                sumUSD += subtotalUSD;
-                itemsHtml += `
-                    <div class="carrito-item">
-                        <span>${item.nombre}</span>
-                        <span>${item.cantidad} ${item.unidad} x $${item.precio_usd.toFixed(2)}</span>
-                        <span>$${subtotalUSD.toFixed(2)}</span>
-                    </div>
-                `;
+            let html = '';
+            carrito.forEach((item, idx) => {
+                sumUSD += item.precio_usd;
+                html += `<div class="carrito-item">
+                            <div class="carrito-item-info">
+                                ${item.nombre}<br>
+                                <small>${item.cantidad} ${item.unidad} x $${(item.precio_usd/item.cantidad).toFixed(2)}</small>
+                            </div>
+                            <div>
+                                <b>$${item.precio_usd.toFixed(2)}</b> / ${item.precio_bs.toFixed(0)} Bs
+                            </div>
+                            <button class="btn-eliminar" onclick="eliminarDelCarrito(${idx})">🗑️</button>
+                        </div>`;
             });
-            
-            const sumBS = sumUSD * tasa;
-            
-            carritoItemsDiv.innerHTML = itemsHtml;
-            totalUSD.innerText = sumUSD.toFixed(2);
-            totalBS.innerText = sumBS.toFixed(2);
-            carritoCount.innerText = `${carrito.length} items`;
+            itemsDiv.innerHTML = html;
+            totalUSDspan.innerText = sumUSD.toFixed(2);
+            totalBSspan.innerText = (sumUSD * tasa).toFixed(2);
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarrito();
+        }
+
+        function cerrarCarrito() {
+            document.getElementById('carrito').style.display = 'none';
+        }
+
+        function abrirModalManual() {
+            document.getElementById('modalManual').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modalManual').style.display = 'none';
+            document.getElementById('manualMonto').value = '';
+            document.getElementById('manualDesc').value = '';
         }
 
         function pagar() {
             if (carrito.length === 0) {
-                tg.showAlert('Agrega productos primero');
+                tg.showAlert('Carrito vacío');
                 return;
             }
-            
+            // Preparar datos para enviar al bot
             const productosParaEnviar = carrito.map(item => ({
-                nombre: item.nombre.split(' ')[1] || item.nombre,
+                nombre: item.nombre,
                 cantidad: item.cantidad,
-                tipo: item.tipo
+                unidad: item.unidad,
+                precio_usd: item.precio_usd,
+                manual: item.manual || false
             }));
-            
             const datos = {
                 productos: productosParaEnviar,
                 tasa: tasa
             };
-            
             tg.sendData(JSON.stringify(datos));
             tg.close();
         }
 
-        // Event listeners para categorías
+        // Categorías
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -461,7 +443,23 @@
             });
         });
 
-        // Inicializar
+        // Botón flotante para añadir manual (opcional)
+        const btnManualGlobal = document.createElement('button');
+        btnManualGlobal.innerText = '➕ Añadir por peso manual';
+        btnManualGlobal.style.position = 'fixed';
+        btnManualGlobal.style.bottom = '80px';
+        btnManualGlobal.style.right = '16px';
+        btnManualGlobal.style.background = '#ff9800';
+        btnManualGlobal.style.color = 'white';
+        btnManualGlobal.style.border = 'none';
+        btnManualGlobal.style.padding = '10px 16px';
+        btnManualGlobal.style.borderRadius = '30px';
+        btnManualGlobal.style.fontWeight = 'bold';
+        btnManualGlobal.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        btnManualGlobal.style.zIndex = '100';
+        btnManualGlobal.onclick = abrirModalManual;
+        document.body.appendChild(btnManualGlobal);
+
         renderizarProductos();
     </script>
 </body>
