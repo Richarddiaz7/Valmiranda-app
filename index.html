@@ -48,8 +48,8 @@
     </div>
 
     <div id="page-inv" class="page">
-        <h3>📦 Stock en Tiempo Real</h3>
-        <div id="inv-display">Cargando base de datos...</div>
+        <h3>📦 Stock Real en Almacén</h3>
+        <div id="inv-display">Cargando datos de la bodega...</div>
         <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
     </div>
 
@@ -75,8 +75,26 @@
         let cart = [];
 
         const params = new URLSearchParams(window.location.search);
+        
+        // Cargar Estadísticas
         document.getElementById('v-hoy').innerText = (params.get('v') || '0.00') + "$";
         document.getElementById('g-neta').innerText = (params.get('g') || '0.00') + "$";
+
+        // CARGAR INVENTARIO DINÁMICO
+        const invRaw = params.get('inv');
+        const invDisplay = document.getElementById('inv-display');
+        if (invRaw) {
+            invDisplay.innerHTML = "";
+            const productos = invRaw.split(",");
+            productos.forEach(p => {
+                const [nombre, stock] = p.split(":");
+                invDisplay.innerHTML += `
+                    <div class="item-card">
+                        <span><b>${nombre}</b></span>
+                        <span style="color:${parseFloat(stock) < 5 ? 'red' : 'green'}">${stock} disp.</span>
+                    </div>`;
+            });
+        }
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
