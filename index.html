@@ -8,13 +8,13 @@
     <style>
         :root { --p-color: #27ae60; --bg: #f4f7f6; }
         body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 0; color: #2c3e50; }
-        .header { background: var(--p-color); color: white; padding: 15px; text-align: center; font-weight: bold; }
+        .header { background: var(--p-color); color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; }
         .page { display: none; padding: 15px; }
         .page.active { display: block; }
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stat-card { background: white; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; }
-        .item-row { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; border: 1px solid #ddd; }
+        .item-card { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -22,19 +22,23 @@
 
     <div id="page-home" class="page active">
         <div class="stats">
-            <div class="stat-card"><span>Ventas</span><h2 id="v-hoy">0$</h2></div>
+            <div class="stat-card"><span>Ventas Hoy</span><h2 id="v-hoy">0$</h2></div>
             <div class="stat-card"><span>Ganancia</span><h2 id="g-neta">0$</h2></div>
         </div>
         <button class="nav-btn" style="background:#2ecc71" onclick="showPage('page-sales')">🛒 NUEVA VENTA</button>
-        <button class="nav-btn" style="background:#34495e" onclick="pedirDatos('INV')">📦 VER INVENTARIO</button>
+        <button class="nav-btn" style="background:#34495e" onclick="showPage('page-inv')">📦 VER INVENTARIO</button>
     </div>
 
     <div id="page-sales" class="page">
-        <h3>🛒 Productos Disponibles</h3>
-        <p style="font-size:12px; color:#666;">Seleccione para cargar en el chat:</p>
-        <div class="item-row" onclick="enviar('VENTA:Papa')"><span>🥔 Papa</span> <span>➕</span></div>
-        <div class="item-row" onclick="enviar('VENTA:Cebolla')"><span>🧅 Cebolla</span> <span>➕</span></div>
-        <div class="item-row" onclick="enviar('VENTA:Tomate')"><span>🍅 Tomate</span> <span>➕</span></div>
+        <h3>🛒 Productos</h3>
+        <div class="item-card" onclick="enviar('VENTA:Papa')"><span>🥔 Papa</span> <span>➕</span></div>
+        <div class="item-card" onclick="enviar('VENTA:Cebolla')"><span>🧅 Cebolla</span> <span>➕</span></div>
+        <button class="nav-btn" style="background:#95a5a6; margin-top:20px;" onclick="showPage('page-home')">⬅ VOLVER</button>
+    </div>
+
+    <div id="page-inv" class="page">
+        <h3>📦 Stock en Almacén</h3>
+        <div id="inv-lista">Cargando inventario...</div>
         <button class="nav-btn" style="background:#95a5a6; margin-top:20px;" onclick="showPage('page-home')">⬅ VOLVER</button>
     </div>
 
@@ -46,15 +50,20 @@
         document.getElementById('v-hoy').innerText = (params.get('v') || '0.00') + "$";
         document.getElementById('g-neta').innerText = (params.get('g') || '0.00') + "$";
 
+        // Pintamos el inventario si el bot lo envió por la URL
+        const invRaw = params.get('inv');
+        if (invRaw) {
+            const lista = document.getElementById('inv-lista');
+            lista.innerHTML = "";
+            invRaw.split(",").forEach(p => {
+                const [nom, stk] = p.split(":");
+                lista.innerHTML += `<div class="item-card"><span>${nom}</span> <b>${stk} disp.</b></div>`;
+            });
+        }
+
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-        }
-
-        function pedirDatos(tipo) {
-            // Le avisa al bot que queremos ver el inventario real en el chat
-            tg.sendData("PEDIR_" + tipo);
-            tg.close();
         }
 
         function enviar(data) {
