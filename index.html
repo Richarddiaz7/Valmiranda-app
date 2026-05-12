@@ -3,167 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Valmiranda - Víveres y Frutas</title>
+    <title>Valmiranda - Sistema de Ventas</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f0f2f5;
-            padding: 16px;
-            padding-bottom: 160px;
+            background: #f5f7fb;
+            padding-bottom: 70px;
         }
+
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #27ae60, #219a52);
+            background: linear-gradient(135deg, #27ae60, #1e8449);
             color: white;
             padding: 16px;
-            border-radius: 16px;
-            margin-bottom: 16px;
             text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+
         .stats {
             display: flex;
             justify-content: space-between;
             margin-top: 12px;
-            gap: 10px;
+            gap: 12px;
         }
-        .stat {
+
+        .stat-card {
             background: rgba(255,255,255,0.2);
             padding: 8px;
-            border-radius: 10px;
+            border-radius: 12px;
             flex: 1;
-            font-size: 14px;
         }
-        .categorias {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-        }
-        .cat-btn {
-            background: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .cat-btn.active {
-            background: #27ae60;
-            color: white;
-        }
-        .producto {
-            background: white;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .producto-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-        .producto-nombre { font-size: 16px; font-weight: bold; }
-        .precio-usd { font-size: 14px; color: #27ae60; font-weight: bold; }
-        .precio-bs { font-size: 12px; color: #7f8c8d; }
-        .producto-control {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f0f2f5;
-            padding: 5px 10px;
-            border-radius: 30px;
-        }
-        .control-group input {
-            width: 60px;
-            padding: 6px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .control-group select {
-            padding: 6px;
-            border-radius: 8px;
-        }
-        .btn-agregar {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .carrito {
+
+        /* Navegación inferior */
+        .nav-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: white;
-            border-top: 3px solid #27ae60;
-            padding: 12px;
-            max-height: 70vh;
-            overflow-y: auto;
-            border-radius: 20px 20px 0 0;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #e0e0e0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
         }
-        .carrito-item {
+
+        .nav-item {
+            text-align: center;
+            flex: 1;
+            padding: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 30px;
+            margin: 0 5px;
+        }
+
+        .nav-item.active {
+            background: #27ae60;
+            color: white;
+        }
+
+        .nav-item span {
+            display: block;
+            font-size: 20px;
+        }
+
+        .nav-item label {
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Páginas */
+        .page {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Tarjetas de producto */
+        .producto-card {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #ecf0f1;
+            flex-wrap: wrap;
         }
-        .carrito-item-info {
-            flex: 1;
-            font-size: 14px;
+
+        .producto-info {
+            flex: 2;
         }
-        .btn-eliminar {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .total {
-            font-size: 18px;
+
+        .producto-nombre {
             font-weight: bold;
-            text-align: right;
-            margin: 12px 0;
+            font-size: 16px;
         }
-        .btn-pagar {
-            width: 100%;
+
+        .producto-precios {
+            font-size: 13px;
+            color: #27ae60;
+        }
+
+        .producto-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .control-group {
+            background: #f0f2f5;
+            padding: 5px 10px;
+            border-radius: 30px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .control-group input, .control-group select {
+            border: none;
+            background: transparent;
+            width: 60px;
+            text-align: center;
+        }
+
+        button {
             background: #27ae60;
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 30px;
             font-weight: bold;
             cursor: pointer;
         }
-        .btn-volver {
-            background: #95a5a6;
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.secondary {
+            background: #3498db;
+        }
+
+        /* Carrito */
+        .carrito-item {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-box {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        /* Inventario */
+        .inventario-item {
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .inventario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .inventario-controls {
+            display: flex;
+            gap: 8px;
             margin-top: 8px;
         }
-        .tasa-info {
-            font-size: 12px;
-            text-align: center;
-            margin-top: 8px;
-            color: #7f8c8d;
-        }
+
         .modal {
             display: none;
             position: fixed;
@@ -174,36 +219,45 @@
             background: rgba(0,0,0,0.5);
             justify-content: center;
             align-items: center;
-            z-index: 1000;
+            z-index: 200;
         }
+
         .modal-content {
             background: white;
             padding: 20px;
-            border-radius: 16px;
-            width: 80%;
-            max-width: 280px;
-            text-align: center;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 320px;
         }
-        .modal-content input {
+
+        .modal-content input, .modal-content select {
             width: 100%;
             padding: 10px;
-            margin: 12px 0;
+            margin: 8px 0;
             border: 1px solid #ddd;
             border-radius: 8px;
         }
-        .btn-manual-flotante {
+
+        .flex-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-flotante {
             position: fixed;
             bottom: 80px;
             right: 16px;
             background: #ff9800;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 30px;
-            font-weight: bold;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            z-index: 100;
-            cursor: pointer;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 90;
         }
     </style>
 </head>
@@ -211,102 +265,152 @@
     <div class="header">
         <h2>🏪 VIVERES VALMIRANDA</h2>
         <div class="stats">
-            <div class="stat">💰 Ventas hoy<br><span id="ventasHoy">$0</span></div>
-            <div class="stat">💶 Tasa<br><span id="tasaDisplay">0</span> Bs</div>
+            <div class="stat-card">💰 Ventas hoy<br><span id="ventasHoy">$0</span></div>
+            <div class="stat-card">💶 Tasa<br><span id="tasaDisplay">0</span> Bs</div>
         </div>
     </div>
 
-    <div class="categorias">
-        <button class="cat-btn active" data-cat="todos">🍽️ TODOS</button>
-        <button class="cat-btn" data-cat="verdura">🥬 VERDURAS</button>
-        <button class="cat-btn" data-cat="fruta">🍎 FRUTAS</button>
-        <button class="cat-btn" data-cat="viveres">📦 VÍVERES</button>
+    <!-- Página Productos -->
+    <div id="page-productos" class="page active">
+        <div id="listaProductos"></div>
+        <!-- Botón peso manual -->
+        <button class="btn-flotante" onclick="abrirModalManual()">⚖️</button>
     </div>
 
-    <div id="productos"></div>
+    <!-- Página Carrito -->
+    <div id="page-carrito" class="page">
+        <div id="carritoLista"></div>
+        <div id="carritoTotal" class="total-box"></div>
+        <button onclick="pagar()" style="width:100%;">✅ PAGAR AHORA</button>
+    </div>
 
-    <div class="carrito" id="carrito" style="display: none;">
-        <div style="font-weight: bold; margin-bottom: 8px;">🛒 CARRITO</div>
-        <div id="carritoItems"></div>
-        <div class="total">
-            <div>USD: $<span id="totalUSD">0.00</span></div>
-            <div>Bs: <span id="totalBS">0.00</span></div>
+    <!-- Página Inventario (Admin) -->
+    <div id="page-inventario" class="page">
+        <div style="margin-bottom: 16px;">
+            <button class="secondary" onclick="abrirModalNuevoProducto()">➕ NUEVO PRODUCTO</button>
         </div>
-        <button class="btn-pagar" onclick="pagar()">✅ PAGAR AHORA</button>
-        <button class="btn-pagar btn-volver" onclick="cerrarCarrito()">⬅ VOLVER A LA TIENDA</button>
-        <div class="tasa-info" id="tasaInfo"></div>
+        <div id="inventarioLista"></div>
     </div>
 
+    <!-- Barra de navegación inferior -->
+    <div class="nav-bar">
+        <div class="nav-item active" data-page="productos">
+            <span>🛒</span><label>Productos</label>
+        </div>
+        <div class="nav-item" data-page="carrito">
+            <span>🛍️</span><label>Carrito (<span id="cartBadge">0</span>)</label>
+        </div>
+        <div class="nav-item" data-page="inventario">
+            <span>📦</span><label>Inventario</label>
+        </div>
+    </div>
+
+    <!-- Modal para peso manual -->
     <div id="modalManual" class="modal">
         <div class="modal-content">
-            <h3>💰 Ingrese el monto en Bs</h3>
+            <h3>💰 Ingrese monto en Bs</h3>
             <input type="number" id="manualMonto" placeholder="Ej: 2500" step="any">
-            <label>Descripción:</label>
-            <input type="text" id="manualDesc" placeholder="Ej: Queso 500g">
-            <button onclick="agregarManual()" style="background:#27ae60; padding:8px; border:none; border-radius:8px; color:white;">Agregar al carrito</button>
-            <button onclick="cerrarModal()" style="background:#95a5a6; margin-top:8px; padding:8px; border:none; border-radius:8px;">Cancelar</button>
+            <input type="text" id="manualDesc" placeholder="Descripción (Ej: Queso 500g)">
+            <div class="flex-buttons">
+                <button onclick="agregarManual()">Agregar</button>
+                <button class="danger" onclick="cerrarModal()">Cancelar</button>
+            </div>
         </div>
     </div>
 
-    <button class="btn-manual-flotante" onclick="abrirModalManual()">➕ Peso manual</button>
+    <!-- Modal para nuevo producto -->
+    <div id="modalNuevoProducto" class="modal">
+        <div class="modal-content">
+            <h3>📦 Nuevo Producto</h3>
+            <input type="text" id="nuevoNombre" placeholder="Nombre">
+            <input type="number" id="nuevoPrecioUSD" placeholder="Precio USD" step="0.01">
+            <select id="nuevoTipo">
+                <option value="peso">Por peso (kg/g)</option>
+                <option value="unidad">Por unidad</option>
+            </select>
+            <input type="number" id="nuevoStock" placeholder="Stock inicial" step="any">
+            <div class="flex-buttons">
+                <button onclick="crearProducto()">Crear</button>
+                <button class="danger" onclick="cerrarModalNuevo()">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        let ventasHoy = parseFloat(urlParams.get('v')) || 0;
-        let tasa = parseFloat(urlParams.get('tasa')) || 60;
+        // Variables globales
+        let tasa = 60;
+        let productos = [];
+        let carrito = [];
+        let ventasHoy = 0;
 
+        // Cargar datos iniciales desde URL
+        const urlParams = new URLSearchParams(window.location.search);
+        ventasHoy = parseFloat(urlParams.get('v')) || 0;
+        tasa = parseFloat(urlParams.get('tasa')) || 60;
         document.getElementById('ventasHoy').innerHTML = `$${ventasHoy.toFixed(2)}`;
         document.getElementById('tasaDisplay').innerHTML = `${tasa.toFixed(0)}`;
-        document.getElementById('tasaInfo').innerHTML = `💵 1 USD = ${tasa.toFixed(2)} Bs`;
 
-        const productos = [
-            { id: 1, nombre: '🥔 Papa', precio_usd: 2.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
-            { id: 2, nombre: '🧅 Cebolla', precio_usd: 1.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
-            { id: 3, nombre: '🍅 Tomate', precio_usd: 2.50, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
-            { id: 4, nombre: '🥬 Lechuga', precio_usd: 1.20, categoria: 'verdura', tipo: 'unidad', unidad_base: 'unidad' },
-            { id: 5, nombre: '🥕 Zanahoria', precio_usd: 1.00, categoria: 'verdura', tipo: 'peso', unidad_base: 'kg' },
-            { id: 6, nombre: '🍌 Cambur', precio_usd: 1.20, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg' },
-            { id: 7, nombre: '🍎 Manzana', precio_usd: 3.00, categoria: 'fruta', tipo: 'peso', unidad_base: 'kg' },
-            { id: 8, nombre: '🍚 Arroz 1kg', precio_usd: 1.80, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad' },
-            { id: 9, nombre: '🍬 Azúcar 1kg', precio_usd: 1.20, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad' },
-            { id: 10, nombre: '🥛 Leche 1L', precio_usd: 1.50, categoria: 'viveres', tipo: 'unidad', unidad_base: 'unidad' }
-        ];
+        // Cargar inventario desde el bot (usando API simulada por ahora)
+        // Como no tenemos API directa, usaremos datos de ejemplo + capacidad de actualizar mediante comandos
+        // En un sistema real, harías fetch a una API del bot. Aquí simulamos con localStorage o datos iniciales.
+        function cargarInventario() {
+            // Intentar recuperar de localStorage
+            let localProd = localStorage.getItem('productos');
+            if (localProd) {
+                productos = JSON.parse(localProd);
+            } else {
+                // Productos de ejemplo
+                productos = [
+                    { id: 1, nombre: 'Papa', precio_usd: 2.00, tipo: 'peso', stock: 100, unidad: 'kg' },
+                    { id: 2, nombre: 'Cebolla', precio_usd: 1.50, tipo: 'peso', stock: 100, unidad: 'kg' },
+                    { id: 3, nombre: 'Tomate', precio_usd: 2.50, tipo: 'peso', stock: 100, unidad: 'kg' },
+                    { id: 4, nombre: 'Lechuga', precio_usd: 1.20, tipo: 'unidad', stock: 100, unidad: 'unidad' },
+                    { id: 5, nombre: 'Arroz', precio_usd: 1.80, tipo: 'unidad', stock: 100, unidad: 'unidad' },
+                    { id: 6, nombre: 'Azúcar', precio_usd: 1.20, tipo: 'unidad', stock: 100, unidad: 'unidad' }
+                ];
+            }
+            // Asegurar que cada producto tiene precio_bs dinámico
+            productos.forEach(p => p.precio_bs = p.precio_usd * tasa);
+            renderizarProductos();
+            renderizarInventario();
+            guardarInventarioLocal();
+        }
 
-        let carrito = [];
+        function guardarInventarioLocal() {
+            localStorage.setItem('productos', JSON.stringify(productos));
+        }
 
-        function renderizarProductos(categoria = 'todos') {
-            const contenedor = document.getElementById('productos');
+        function renderizarProductos() {
+            const contenedor = document.getElementById('listaProductos');
             contenedor.innerHTML = '';
-            const filtrados = categoria === 'todos' ? productos : productos.filter(p => p.categoria === categoria);
-            filtrados.forEach(p => {
+            productos.forEach(p => {
                 const div = document.createElement('div');
-                div.className = 'producto';
+                div.className = 'producto-card';
                 div.innerHTML = `
                     <div class="producto-info">
-                        <span class="producto-nombre">${p.nombre}</span>
-                        <div>
-                            <div class="precio-usd">$${p.precio_usd}</div>
-                            <div class="precio-bs">Bs ${(p.precio_usd * tasa).toFixed(0)}</div>
+                        <div class="producto-nombre">${p.nombre}</div>
+                        <div class="producto-precios">
+                            $${p.precio_usd} / ${(p.precio_usd * tasa).toFixed(0)} Bs
                         </div>
                     </div>
-                    <div class="producto-control">
+                    <div class="producto-controls">
                         <div class="control-group">
                             ${p.tipo === 'peso' ? `
-                                <input type="number" id="cant-${p.id}" value="1" step="0.1" min="0.1">
+                                <input type="number" id="cant-${p.id}" value="1" step="0.1" min="0.1" style="width:70px">
                                 <select id="unidad-${p.id}">
                                     <option value="kg">kg</option>
                                     <option value="g">gramos</option>
                                 </select>
                             ` : `
-                                <input type="number" id="cant-${p.id}" value="1" step="1" min="1" style="width:60px">
-                                <span>${p.unidad_base}</span>
+                                <input type="number" id="cant-${p.id}" value="1" step="1" min="1" style="width:70px">
+                                <span>${p.unidad}</span>
                             `}
                         </div>
-                        <button class="btn-agregar" onclick="agregarAlCarrito(${p.id})">➕ Agregar</button>
+                        <button onclick="agregarAlCarrito(${p.id})">➕</button>
                     </div>
                 `;
                 contenedor.appendChild(div);
@@ -317,17 +421,18 @@
             const producto = productos.find(p => p.id === id);
             let cantidad = parseFloat(document.getElementById(`cant-${id}`).value);
             if (isNaN(cantidad) || cantidad <= 0) cantidad = 1;
-            let unidad = producto.unidad_base;
+            let unidad = producto.unidad;
+            let precio_usd_item = producto.precio_usd;
             if (producto.tipo === 'peso') {
                 const unidadSelect = document.getElementById(`unidad-${id}`);
                 if (unidadSelect && unidadSelect.value === 'g') {
-                    cantidad = cantidad / 1000; // gramos a kg
+                    cantidad = cantidad / 1000; // convertir a kg
                     unidad = 'g';
-                } else {
-                    unidad = 'kg';
                 }
+                precio_usd_item = producto.precio_usd * cantidad;
+            } else {
+                precio_usd_item = producto.precio_usd * cantidad;
             }
-            const precio_usd_item = producto.precio_usd * cantidad;
             const precio_bs_item = precio_usd_item * tasa;
             carrito.push({
                 id: producto.id,
@@ -338,16 +443,166 @@
                 precio_bs: precio_bs_item
             });
             actualizarCarrito();
+            document.getElementById('cartBadge').innerText = carrito.length;
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
+        function actualizarCarrito() {
+            const contenedor = document.getElementById('carritoLista');
+            const totalDiv = document.getElementById('carritoTotal');
+            if (carrito.length === 0) {
+                contenedor.innerHTML = '<p style="text-align:center">Carrito vacío</p>';
+                totalDiv.innerHTML = '';
+                return;
+            }
+            let sumUSD = 0;
+            let html = '';
+            carrito.forEach((item, idx) => {
+                sumUSD += item.precio_usd;
+                html += `
+                    <div class="carrito-item">
+                        <div>
+                            <strong>${item.nombre}</strong><br>
+                            ${item.cantidad} ${item.unidad} x $${(item.precio_usd/item.cantidad).toFixed(2)}
+                        </div>
+                        <div>
+                            $${item.precio_usd.toFixed(2)} / ${item.precio_bs.toFixed(0)} Bs
+                            <button class="danger" onclick="eliminarDelCarrito(${idx})" style="margin-left:8px;">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            const sumBS = sumUSD * tasa;
+            contenedor.innerHTML = html;
+            totalDiv.innerHTML = `
+                <strong>TOTAL</strong><br>
+                USD: $${sumUSD.toFixed(2)}<br>
+                Bs: ${sumBS.toFixed(2)}
+            `;
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarrito();
+            document.getElementById('cartBadge').innerText = carrito.length;
+        }
+
+        function pagar() {
+            if (carrito.length === 0) {
+                tg.showAlert('Carrito vacío');
+                return;
+            }
+            const productosEnviar = carrito.map(item => ({
+                nombre: item.nombre,
+                cantidad: item.cantidad,
+                unidad: item.unidad,
+                precio_usd: item.precio_usd,
+                manual: false
+            }));
+            const datos = { productos: productosEnviar, tasa: tasa };
+            tg.sendData(JSON.stringify(datos));
+            // Limpiar carrito local después de pagar (opcional, pero el bot cerrará la app)
+            carrito = [];
+            actualizarCarrito();
+            tg.close();
+        }
+
+        // Administración de inventario
+        function renderizarInventario() {
+            const contenedor = document.getElementById('inventarioLista');
+            contenedor.innerHTML = '';
+            productos.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'inventario-item';
+                div.innerHTML = `
+                    <div class="inventario-header">
+                        <strong>${p.nombre}</strong>
+                        <span>Stock: ${p.stock} ${p.unidad}</span>
+                    </div>
+                    <div>Precio: $${p.precio_usd} (${(p.precio_usd*tasa).toFixed(0)} Bs)</div>
+                    <div class="inventario-controls">
+                        <input type="number" id="stock-${p.id}" placeholder="Nuevo stock" step="any" style="width:100px">
+                        <button onclick="actualizarStock(${p.id})">Actualizar stock</button>
+                        <button class="secondary" onclick="editarPrecio(${p.id})">Editar precio</button>
+                    </div>
+                `;
+                contenedor.appendChild(div);
+            });
+        }
+
+        function actualizarStock(id) {
+            const input = document.getElementById(`stock-${id}`);
+            let nuevoStock = parseFloat(input.value);
+            if (isNaN(nuevoStock)) return;
+            const producto = productos.find(p => p.id === id);
+            producto.stock = nuevoStock;
+            guardarInventarioLocal();
+            renderizarInventario();
+            // Enviar comando al bot para sincronizar
+            tg.sendData(`ADMIN:STOCK:${id}:${nuevoStock}`);
+            tg.showAlert(`Stock actualizado: ${producto.nombre} = ${nuevoStock}`);
+        }
+
+        function editarPrecio(id) {
+            const nuevoPrecio = prompt("Nuevo precio en USD:");
+            if (nuevoPrecio && !isNaN(parseFloat(nuevoPrecio))) {
+                const producto = productos.find(p => p.id === id);
+                producto.precio_usd = parseFloat(nuevoPrecio);
+                producto.precio_bs = producto.precio_usd * tasa;
+                guardarInventarioLocal();
+                renderizarProductos();
+                renderizarInventario();
+                tg.sendData(`ADMIN:PRECIO:${id}:${producto.precio_usd}`);
+                tg.showAlert(`Precio actualizado: ${producto.nombre} = $${producto.precio_usd}`);
+            }
+        }
+
+        function abrirModalNuevoProducto() {
+            document.getElementById('modalNuevoProducto').style.display = 'flex';
+        }
+
+        function cerrarModalNuevo() {
+            document.getElementById('modalNuevoProducto').style.display = 'none';
+        }
+
+        function crearProducto() {
+            const nombre = document.getElementById('nuevoNombre').value.trim();
+            const precio = parseFloat(document.getElementById('nuevoPrecioUSD').value);
+            const tipo = document.getElementById('nuevoTipo').value;
+            const stock = parseFloat(document.getElementById('nuevoStock').value);
+            if (!nombre || isNaN(precio) || isNaN(stock)) {
+                tg.showAlert('Complete todos los campos');
+                return;
+            }
+            const nuevoId = Date.now(); // ID simple
+            const nuevoProducto = {
+                id: nuevoId,
+                nombre: nombre,
+                precio_usd: precio,
+                tipo: tipo,
+                stock: stock,
+                unidad: (tipo === 'peso') ? 'kg' : 'unidad'
+            };
+            productos.push(nuevoProducto);
+            guardarInventarioLocal();
+            renderizarProductos();
+            renderizarInventario();
+            cerrarModalNuevo();
+            tg.sendData(`ADMIN:NUEVO:${nuevoId}:${nombre}:${precio}:${tipo}:${stock}`);
+            tg.showAlert(`Producto ${nombre} creado`);
+        }
+
+        // Peso manual
+        function abrirModalManual() {
+            document.getElementById('modalManual').style.display = 'flex';
+        }
+        function cerrarModal() {
+            document.getElementById('modalManual').style.display = 'none';
+        }
         function agregarManual() {
             const montoBs = parseFloat(document.getElementById('manualMonto').value);
             const desc = document.getElementById('manualDesc').value.trim() || "Producto manual";
-            if (isNaN(montoBs) || montoBs <= 0) {
-                tg.showAlert("Ingrese un monto válido en Bs");
-                return;
-            }
+            if (isNaN(montoBs)) return;
             const montoUsd = montoBs / tasa;
             carrito.push({
                 id: null,
@@ -358,88 +613,32 @@
                 precio_bs: montoBs,
                 manual: true
             });
+            actualizarCarrito();
+            document.getElementById('cartBadge').innerText = carrito.length;
             cerrarModal();
-            actualizarCarrito();
         }
 
-        function actualizarCarrito() {
-            const carritoDiv = document.getElementById('carrito');
-            const itemsDiv = document.getElementById('carritoItems');
-            const totalUSDspan = document.getElementById('totalUSD');
-            const totalBSspan = document.getElementById('totalBS');
-            if (carrito.length === 0) {
-                carritoDiv.style.display = 'none';
-                return;
-            }
-            carritoDiv.style.display = 'block';
-            let sumUSD = 0;
-            let html = '';
-            carrito.forEach((item, idx) => {
-                sumUSD += item.precio_usd;
-                html += `<div class="carrito-item">
-                            <div class="carrito-item-info">
-                                ${item.nombre}<br>
-                                <small>${item.cantidad} ${item.unidad} x $${(item.precio_usd/item.cantidad).toFixed(2)}</small>
-                            </div>
-                            <div>
-                                <b>$${item.precio_usd.toFixed(2)}</b> / ${item.precio_bs.toFixed(0)} Bs
-                            </div>
-                            <button class="btn-eliminar" onclick="eliminarDelCarrito(${idx})">🗑️</button>
-                        </div>`;
-            });
-            itemsDiv.innerHTML = html;
-            totalUSDspan.innerText = sumUSD.toFixed(2);
-            totalBSspan.innerText = (sumUSD * tasa).toFixed(2);
-        }
-
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
-            actualizarCarrito();
-        }
-
-        function cerrarCarrito() {
-            document.getElementById('carrito').style.display = 'none';
-        }
-
-        function abrirModalManual() {
-            document.getElementById('modalManual').style.display = 'flex';
-        }
-
-        function cerrarModal() {
-            document.getElementById('modalManual').style.display = 'none';
-            document.getElementById('manualMonto').value = '';
-            document.getElementById('manualDesc').value = '';
-        }
-
-        function pagar() {
-            if (carrito.length === 0) {
-                tg.showAlert('Carrito vacío');
-                return;
-            }
-            const productosParaEnviar = carrito.map(item => ({
-                nombre: item.nombre,
-                cantidad: item.cantidad,
-                unidad: item.unidad,
-                precio_usd: item.precio_usd,
-                manual: item.manual || false
-            }));
-            const datos = {
-                productos: productosParaEnviar,
-                tasa: tasa
-            };
-            tg.sendData(JSON.stringify(datos));
-            tg.close();
-        }
-
-        document.querySelectorAll('.cat-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                renderizarProductos(btn.dataset.cat);
+        // Navegación entre páginas
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const pageId = item.dataset.page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`page-${pageId}`).classList.add('active');
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                if (pageId === 'carrito') actualizarCarrito();
+                if (pageId === 'inventario') renderizarInventario();
             });
         });
 
-        renderizarProductos();
+        cargarInventario();
+        setInterval(() => {
+            // Actualizar precios en Bs si cambia la tasa (simulado, se recibe desde URL)
+            productos.forEach(p => p.precio_bs = p.precio_usd * tasa);
+            renderizarProductos();
+            renderizarInventario();
+            actualizarCarrito();
+        }, 1000);
     </script>
 </body>
 </html>
