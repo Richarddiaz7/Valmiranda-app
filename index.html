@@ -10,7 +10,7 @@
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
             background: #f0f2f5;
-            padding-bottom: 70px;
+            padding-bottom: 80px;
         }
         .header {
             background: linear-gradient(135deg, #27ae60, #1e8449);
@@ -34,6 +34,7 @@
             border-radius: 12px;
             flex: 1;
         }
+        /* Barra de navegación inferior fija */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -42,9 +43,10 @@
             background: white;
             display: flex;
             justify-content: space-around;
-            padding: 8px 0;
+            padding: 10px 0;
             border-top: 1px solid #ddd;
             z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
         }
         .nav-item {
             text-align: center;
@@ -79,12 +81,14 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            flex-wrap: wrap;
         }
         .producto-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
         }
         .control-group {
             background: #f0f2f5;
@@ -108,19 +112,21 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
+        button:active { transform: scale(0.98); }
         button.danger { background: #e74c3c; }
         button.secondary { background: #3498db; }
         button.warning { background: #f39c12; }
+        
+        /* ===== CARRITO CORREGIDO - BOTONES SIEMPRE VISIBLES ===== */
         .carrito-container {
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 180px);
-            max-height: calc(100vh - 180px);
-            overflow: hidden;
+            padding-bottom: 20px;
         }
         .carrito-lista {
-            flex: 1;
+            max-height: 45vh;
             overflow-y: auto;
             padding-right: 4px;
             margin-bottom: 16px;
@@ -138,16 +144,20 @@
             padding: 16px;
             text-align: right;
             margin: 16px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
         .botones-accion {
             display: flex;
             gap: 12px;
-            margin-top: 16px;
+            margin: 16px 0;
             flex-direction: column;
+            position: relative;
+            z-index: 50;
         }
         .botones-accion button {
             width: 100%;
             padding: 14px;
+            font-size: 16px;
         }
         .btn-flotante {
             position: fixed;
@@ -194,6 +204,7 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
+            flex-wrap: wrap;
         }
         .inventario-controls {
             display: flex;
@@ -210,6 +221,10 @@
             font-size: 12px;
             margin-left: 4px;
         }
+        /* Espacio extra al final del carrito para que no tape la barra */
+        .carrito-spacer {
+            height: 20px;
+        }
     </style>
 </head>
 <body>
@@ -221,22 +236,28 @@
         </div>
     </div>
 
+    <!-- Página Productos -->
     <div id="page-productos" class="page active">
         <div id="listaProductos"></div>
         <button class="btn-flotante" onclick="abrirModalManual()">⚖️</button>
     </div>
 
+    <!-- Página Carrito CORREGIDA -->
     <div id="page-carrito" class="page">
         <div class="carrito-container">
-            <div class="carrito-lista" id="carritoLista"></div>
+            <div class="carrito-lista" id="carritoLista">
+                <p style="text-align:center; padding:20px;">🛒 Carrito vacío</p>
+            </div>
             <div id="carritoTotal" class="total-box"></div>
             <div class="botones-accion">
-                <button class="warning" onclick="cancelarVenta()">❌ CANCELAR VENTA</button>
-                <button onclick="pagar()">✅ PAGAR AHORA</button>
+                <button class="warning" onclick="cancelarVenta()" style="background:#f39c12;">❌ CANCELAR VENTA</button>
+                <button onclick="pagar()" style="background:#27ae60;">✅ PAGAR AHORA</button>
             </div>
+            <div class="carrito-spacer"></div>
         </div>
     </div>
 
+    <!-- Página Inventario -->
     <div id="page-inventario" class="page">
         <div style="margin-bottom: 16px;">
             <button class="secondary" onclick="abrirModalNuevoProducto()">➕ NUEVO PRODUCTO</button>
@@ -244,12 +265,14 @@
         <div id="inventarioLista"></div>
     </div>
 
+    <!-- Barra de navegación inferior -->
     <div class="nav-bar">
         <div class="nav-item active" data-page="productos"><span>🛒</span><label>Productos</label></div>
         <div class="nav-item" data-page="carrito"><span>🛍️</span><label>Carrito <span id="cartBadge" class="badge">0</span></label></div>
         <div class="nav-item" data-page="inventario"><span>📦</span><label>Inventario</label></div>
     </div>
 
+    <!-- Modal para peso manual -->
     <div id="modalManual" class="modal">
         <div class="modal-content">
             <h3>💰 Ingrese monto en Bs</h3>
@@ -262,6 +285,7 @@
         </div>
     </div>
 
+    <!-- Modal para nuevo producto -->
     <div id="modalNuevoProducto" class="modal">
         <div class="modal-content">
             <h3>📦 Nuevo Producto</h3>
@@ -421,10 +445,10 @@
                     <div class="carrito-item">
                         <div>
                             <strong>${item.nombre}</strong><br>
-                            ${item.cantidad} ${item.unidad} x $${(item.precio_usd/item.cantidad).toFixed(2)}
+                            <small>${item.cantidad} ${item.unidad} x $${(item.precio_usd/item.cantidad).toFixed(2)}</small>
                         </div>
                         <div>
-                            $${item.precio_usd.toFixed(2)} / ${item.precio_bs.toFixed(0)} Bs
+                            <b>$${item.precio_usd.toFixed(2)}</b> / ${item.precio_bs.toFixed(0)} Bs
                             <button class="danger" onclick="eliminarDelCarrito(${idx})" style="margin-left:8px;">🗑️</button>
                         </div>
                     </div>
@@ -449,6 +473,7 @@
             carrito = [];
             actualizarCarrito();
             actualizarBadge();
+            // Cambiar a la pestaña de productos
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('page-productos').classList.add('active');
@@ -591,6 +616,7 @@
             cerrarModal();
         }
 
+        // Navegación
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
                 const page = item.dataset.page;
@@ -605,6 +631,7 @@
 
         cargarInventario();
 
+        // Heartbeat para mantener activa la app
         setInterval(() => {
             if (tg.platform) {
                 tg.sendData("PING");
