@@ -1,45 +1,82 @@
-import telebot
-from telebot import types
-import sqlite3
-from datetime import datetime
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valmiranda Pro</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --p-color: #27ae60; --bg: #f4f7f6; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        .header { background: var(--p-color); color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; }
+        .page { display: none; padding: 15px; }
+        .page.active { display: block; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; }
+        .item-card { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .btn-add { background: var(--p-color); color: white; border: none; padding: 5px 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">VALMIRANDA C.A.</div>
 
-TOKEN = '8341381527:AAHpjz8fHUtzpMa-FWEz5At3TtyjbYJJ3sc'
-URL_APP = "https://richarddiaz7.github.io/Valmiranda-app/"
-bot = telebot.TeleBot(TOKEN, threaded=False)
+    <div id="page-home" class="page active">
+        <div class="stats">
+            <div class="stat-card"><span>Ventas Hoy</span><h2 id="v-hoy">...$</h2></div>
+            <div class="stat-card"><span>Ganancia</span><h2 id="g-neta">...$</h2></div>
+        </div>
+        <button class="nav-btn" style="background:#2ecc71" onclick="showPage('page-sales')">🛒 NUEVA VENTA</button>
+        <button class="nav-btn" style="background:#34495e" onclick="showPage('page-inv')">📦 VER INVENTARIO</button>
+    </div>
 
-def conectar():
-    return sqlite3.connect('bodega.db', timeout=20)
+    <div id="page-sales" class="page">
+        <h3>🛒 Productos para Venta</h3>
+        <div id="sales-list">Cargando...</div>
+        <button class="nav-btn" style="background:#95a5a6; margin-top:20px;" onclick="showPage('page-home')">⬅ VOLVER</button>
+    </div>
 
-def obtener_datos():
-    try:
-        conn = conectar(); cursor = conn.cursor()
-        hoy = datetime.now().strftime('%Y-%m-%d')
-        # Ventas reales de hoy
-        cursor.execute("SELECT SUM(total_usd) FROM historial_ventas WHERE fecha LIKE ?", (f"{hoy}%",))
-        v = cursor.fetchone()[0] or 0.0
-        # Inventario completo
-        cursor.execute("SELECT nombre, stock, precio_usd FROM productos")
-        items = cursor.fetchall()
-        inv_str = ",".join([f"{i[0]}:{i[1]}:{i[2]}" for i in items])
-        conn.close()
-        return round(v, 2), round(v * 0.20, 2), inv_str
-    except:
-        return 0.0, 0.0, ""
+    <div id="page-inv" class="page">
+        <h3>📦 Stock en Almacén</h3>
+        <div id="inv-list">Cargando...</div>
+        <button class="nav-btn" style="background:#95a5a6; margin-top:20px;" onclick="showPage('page-home')">⬅ VOLVER</button>
+    </div>
 
-@bot.message_handler(commands=['start'])
-def principal(message):
-    v, g, inv = obtener_datos()
-    # Metemos los datos directo en el link del botón
-    url = f"{URL_APP}?v={v}&g={g}&inv={inv}"
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("🚀 ABRIR SISTEMA", web_app=types.WebAppInfo(url=url)))
-    bot.send_message(message.chat.id, f"🍏 <b>VALMIRANDA PRO ACTIVO</b>\n<i>Datos actualizados en tiempo real.</i>", parse_mode="HTML", reply_markup=markup)
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-@bot.message_handler(content_types=['web_app_data'])
-def receptor(message):
-    data = message.web_app_data.data
-    if data.startswith("VENTA:"):
-        producto = data.split(":")[1]
-        bot.send_message(message.chat.id, f"🛒 Seleccionado: <b>{producto}</b>\n¿Cuántas unidades vendiste?", parse_mode="HTML")
+        const params = new URLSearchParams(window.location.search);
+        
+        // Cargar Estadísticas
+        const v = params.get('v') || '0.00';
+        const g = params.get('g') || '0.00';
+        document.getElementById('v-hoy').innerText = v + "$";
+        document.getElementById('g-neta').innerText = g + "$";
 
-bot.infinity_polling()
+        // Cargar Inventario Dinámico
+        const invRaw = params.get('inv');
+        if (invRaw) {
+            const invList = document.getElementById('inv-list');
+            const salesList = document.getElementById('sales-list');
+            invList.innerHTML = ""; salesList.innerHTML = "";
+            
+            invRaw.split(",").forEach(p => {
+                const [nom, stk, prc] = p.split(":");
+                invList.innerHTML += `<div class="item-card"><span>${nom}</span> <b>${stk} disp.</b></div>`;
+                salesList.innerHTML += `<div class="item-card"><span>${nom} (${prc}$)</span> <button class="btn-add" onclick="enviar('VENTA:${nom}')">+</button></div>`;
+            });
+        }
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function enviar(data) {
+            tg.sendData(data);
+            tg.close();
+        }
+    </script>
+</body>
+</html>
