@@ -14,34 +14,28 @@
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .stat-card { background: white; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 16px; }
-        .item-row { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .item-row { background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
-    <div class="header">BODEGA VALMIRANDA C.A.</div>
+    <div class="header">VALMIRANDA C.A.</div>
 
     <div id="page-home" class="page active">
         <div class="stats">
-            <div class="stat-card"><span>Ventas Hoy</span><h2 id="v-hoy">0$</h2></div>
+            <div class="stat-card"><span>Ventas</span><h2 id="v-hoy">0$</h2></div>
             <div class="stat-card"><span>Ganancia</span><h2 id="g-neta">0$</h2></div>
         </div>
         <button class="nav-btn" style="background:#2ecc71" onclick="showPage('page-sales')">🛒 NUEVA VENTA</button>
-        <button class="nav-btn" style="background:#34495e" onclick="pedirInventario()">📦 VER INVENTARIO</button>
-        <button class="nav-btn" style="background:#8e44ad" onclick="showPage('page-admin')">⚙️ ALMACÉN / GESTIÓN</button>
+        <button class="nav-btn" style="background:#34495e" onclick="pedirDatos('INV')">📦 VER INVENTARIO</button>
     </div>
 
     <div id="page-sales" class="page">
-        <h3>🛒 Seleccione Producto</h3>
+        <h3>🛒 Productos Disponibles</h3>
+        <p style="font-size:12px; color:#666;">Seleccione para cargar en el chat:</p>
         <div class="item-row" onclick="enviar('VENTA:Papa')"><span>🥔 Papa</span> <span>➕</span></div>
         <div class="item-row" onclick="enviar('VENTA:Cebolla')"><span>🧅 Cebolla</span> <span>➕</span></div>
+        <div class="item-row" onclick="enviar('VENTA:Tomate')"><span>🍅 Tomate</span> <span>➕</span></div>
         <button class="nav-btn" style="background:#95a5a6; margin-top:20px;" onclick="showPage('page-home')">⬅ VOLVER</button>
-    </div>
-
-    <div id="page-admin" class="page">
-        <h3>⚙️ Administración</h3>
-        <button class="nav-btn" style="background:#27ae60" onclick="enviar('ADMIN:STOCK')">📦 CARGAR STOCK</button>
-        <button class="nav-btn" style="background:#d35400" onclick="enviar('ADMIN:PRECIO')">💵 EDITAR PRECIOS</button>
-        <button class="nav-btn" style="background:#95a5a6" onclick="showPage('page-home')">⬅ VOLVER</button>
     </div>
 
     <script>
@@ -57,8 +51,9 @@
             document.getElementById(id).classList.add('active');
         }
 
-        function pedirInventario() {
-            tg.sendData("PEDIR_INV");
+        function pedirDatos(tipo) {
+            // Le avisa al bot que queremos ver el inventario real en el chat
+            tg.sendData("PEDIR_" + tipo);
             tg.close();
         }
 
