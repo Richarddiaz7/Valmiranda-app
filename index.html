@@ -7,30 +7,21 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --p-color: #27ae60; --s-color: #2c3e50; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--s-color); overflow-x: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--s-color); }
         .header { background: var(--p-color); color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; }
-        
         .page { display: none; padding: 15px; animation: fadeIn 0.3s; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Dashboard */
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .stat-card h2 { margin: 5px 0; color: var(--p-color); font-size: 1.4rem; }
-
-        /* Listas y Tarjetas */
+        .stat-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 4px solid var(--p-color); }
+        .stat-card h2 { margin: 5px 0; color: var(--p-color); }
         .item-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .btn-add { background: var(--p-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; }
-        
-        /* Botones de Navegación */
+        .btn-add { background: var(--p-color); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
         .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-main { background: var(--p-color); color: white; }
         .btn-sec { background: var(--s-color); color: white; }
         .btn-back { background: #95a5a6; color: white; margin-top: 20px; }
-
-        /* Carrito flotante */
-        #cart-bar { position: fixed; bottom: 0; width: 100%; background: white; border-top: 2px solid var(--p-color); padding: 15px; box-sizing: border-box; display: none; }
+        #cart-bar { position: fixed; bottom: 0; width: 100%; background: white; border-top: 2px solid var(--p-color); padding: 15px; box-sizing: border-box; display: none; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -43,11 +34,11 @@
         </div>
         <button class="nav-btn btn-main" onclick="showPage('page-sales')">🛒 NUEVA VENTA</button>
         <button class="nav-btn btn-sec" onclick="showPage('page-inv')">📦 VER INVENTARIO</button>
-        <button class="nav-btn btn-sec" style="background:#8e44ad;" onclick="showPage('page-admin')">⚙️ GESTIÓN / ALMACÉN</button>
+        <button class="nav-btn btn-sec" style="background:#8e44ad;" onclick="showPage('page-admin')">⚙️ ALMACÉN / GESTIÓN</button>
     </div>
 
     <div id="page-sales" class="page">
-        <h3>🛒 Carrito de Compras</h3>
+        <h3>🛒 Lista de Productos</h3>
         <div id="sales-list">
             <div class="item-card"><span>🥔 Papa (1kg)</span><button class="btn-add" onclick="addToCart('Papa')">+</button></div>
             <div class="item-card"><span>🧅 Cebolla (1kg)</span><button class="btn-add" onclick="addToCart('Cebolla')">+</button></div>
@@ -57,16 +48,16 @@
     </div>
 
     <div id="page-inv" class="page">
-        <h3>📦 Stock Actual</h3>
-        <div id="inv-display">Cargando productos...</div>
+        <h3>📦 Stock en Tiempo Real</h3>
+        <div id="inv-display">Cargando base de datos...</div>
         <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
     </div>
 
     <div id="page-admin" class="page">
-        <h3>⚙️ Administración</h3>
-        <button class="nav-btn btn-main" onclick="action('STOCK')">📦 CARGAR STOCK</button>
-        <button class="nav-btn btn-main" style="background:#d35400;" onclick="action('PRECIO')">💵 EDITAR PRECIOS</button>
-        <button class="nav-btn btn-main" style="background:#c0392b;" onclick="action('BORRAR')">❌ ELIMINAR PRODUCTO</button>
+        <h3>⚙️ Panel Administrativo</h3>
+        <button class="nav-btn btn-main" onclick="sendCmd('STOCK')">📦 CARGAR STOCK</button>
+        <button class="nav-btn btn-main" style="background:#d35400;" onclick="sendCmd('PRECIO')">💵 EDITAR PRECIOS</button>
+        <button class="nav-btn btn-main" style="background:#c0392b;" onclick="sendCmd('BORRAR')">❌ ELIMINAR ITEM</button>
         <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
     </div>
 
@@ -75,14 +66,14 @@
             <span>Items: <b id="cart-count">0</b></span>
             <span>Total: <b id="cart-total">0.00$</b></span>
         </div>
-        <button class="nav-btn btn-main" onclick="finishSale()">🧾 FINALIZAR Y COBRAR</button>
+        <button class="nav-btn btn-main" onclick="finishSale()">🧾 ENVIAR A FACTURAR</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
         let cart = [];
+
         const params = new URLSearchParams(window.location.search);
         document.getElementById('v-hoy').innerText = (params.get('v') || '0.00') + "$";
         document.getElementById('g-neta').innerText = (params.get('g') || '0.00') + "$";
@@ -90,14 +81,13 @@
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(id !== 'page-sales') document.getElementById('cart-bar').style.display = 'none';
+            document.getElementById('cart-bar').style.display = (id === 'page-sales' && cart.length > 0) ? 'block' : 'none';
         }
 
         function addToCart(item) {
             cart.push(item);
             document.getElementById('cart-bar').style.display = 'block';
             document.getElementById('cart-count').innerText = cart.length;
-            // Aquí podrías sumar precios reales si los pasas por la URL
         }
 
         function finishSale() {
@@ -105,7 +95,7 @@
             tg.close();
         }
 
-        function action(type) {
+        function sendCmd(type) {
             tg.sendData("ADMIN:" + type);
             tg.close();
         }
