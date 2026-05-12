@@ -3,100 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda Pro</title>
+    <title>Valmiranda Tienda</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --p-color: #27ae60; --s-color: #2c3e50; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--s-color); }
-        .header { background: var(--p-color); color: white; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100; }
-        .page { display: none; padding: 15px; animation: fadeIn 0.3s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-bottom: 4px solid var(--p-color); }
-        .stat-card h2 { margin: 5px 0; color: var(--p-color); }
-        .item-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .btn-add { background: var(--p-color); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
-        .nav-btn { width: 100%; padding: 15px; margin-bottom: 10px; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-main { background: var(--p-color); color: white; }
-        .btn-sec { background: var(--s-color); color: white; }
-        .btn-back { background: #95a5a6; color: white; margin-top: 20px; }
-        #cart-bar { position: fixed; bottom: 0; width: 100%; background: white; border-top: 2px solid var(--p-color); padding: 15px; box-sizing: border-box; display: none; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: #f5f5f5;
+        }
+        .producto {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .carrito {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 3px solid #27ae60;
+        }
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #27ae60;
+            margin: 10px 0;
+        }
+        .ventas-hoy {
+            background: #27ae60;
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="header">BODEGA VALMIRANDA C.A.</div>
+    <div class="ventas-hoy" id="ventasHoy">
+        Ventas hoy: $0.00
+    </div>
 
-    <div id="page-home" class="page active">
-        <div class="stats">
-            <div class="stat-card"><span>Ventas Hoy</span><h2 id="v-hoy">0.00$</h2></div>
-            <div class="stat-card"><span>Ganancia</span><h2 id="g-neta">0.00$</h2></div>
+    <div id="productos">
+        <div class="producto">
+            <span>🥔 Papa (1kg) - $2.00</span>
+            <button onclick="agregar('Papa')">Agregar</button>
         </div>
-        <button class="nav-btn btn-main" onclick="showPage('page-sales')">🛒 NUEVA VENTA</button>
-        <button class="nav-btn btn-sec" onclick="showPage('page-inv')">📦 VER INVENTARIO</button>
-        <button class="nav-btn btn-sec" style="background:#8e44ad;" onclick="showPage('page-admin')">⚙️ ALMACÉN / GESTIÓN</button>
-    </div>
-
-    <div id="page-sales" class="page">
-        <h3>🛒 Lista de Productos</h3>
-        <div id="sales-list">
-            <div class="item-card"><span>🥔 Papa (1kg)</span><button class="btn-add" onclick="addToCart('Papa')">+</button></div>
-            <div class="item-card"><span>🧅 Cebolla (1kg)</span><button class="btn-add" onclick="addToCart('Cebolla')">+</button></div>
-            <div class="item-card"><span>🍅 Tomate (1kg)</span><button class="btn-add" onclick="addToCart('Tomate')">+</button></div>
+        <div class="producto">
+            <span>🧅 Cebolla (1kg) - $1.50</span>
+            <button onclick="agregar('Cebolla')">Agregar</button>
         </div>
-        <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
-    </div>
-
-    <div id="page-inv" class="page">
-        <h3>📦 Stock en Tiempo Real</h3>
-        <div id="inv-display">Cargando base de datos...</div>
-        <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
-    </div>
-
-    <div id="page-admin" class="page">
-        <h3>⚙️ Panel Administrativo</h3>
-        <button class="nav-btn btn-main" onclick="sendCmd('STOCK')">📦 CARGAR STOCK</button>
-        <button class="nav-btn btn-main" style="background:#d35400;" onclick="sendCmd('PRECIO')">💵 EDITAR PRECIOS</button>
-        <button class="nav-btn btn-main" style="background:#c0392b;" onclick="sendCmd('BORRAR')">❌ ELIMINAR ITEM</button>
-        <button class="nav-btn btn-back" onclick="showPage('page-home')">⬅ VOLVER</button>
-    </div>
-
-    <div id="cart-bar">
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-            <span>Items: <b id="cart-count">0</b></span>
-            <span>Total: <b id="cart-total">0.00$</b></span>
+        <div class="producto">
+            <span>🍅 Tomate (1kg) - $2.50</span>
+            <button onclick="agregar('Tomate')">Agregar</button>
         </div>
-        <button class="nav-btn btn-main" onclick="finishSale()">🧾 ENVIAR A FACTURAR</button>
+    </div>
+
+    <div class="carrito" id="carrito" style="display: none;">
+        <div>🛒 Carrito: <span id="cantidad">0</span> productos</div>
+        <div class="total">Total: $<span id="total">0.00</span></div>
+        <button style="width: 100%; margin-top: 10px;" onclick="pagar()">💰 Pagar</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        let cart = [];
-
+        
+        // Mostrar ventas del día desde la URL
         const params = new URLSearchParams(window.location.search);
-        document.getElementById('v-hoy').innerText = (params.get('v') || '0.00') + "$";
-        document.getElementById('g-neta').innerText = (params.get('g') || '0.00') + "$";
-
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById('cart-bar').style.display = (id === 'page-sales' && cart.length > 0) ? 'block' : 'none';
+        const ventas = params.get('v') || '0';
+        document.getElementById('ventasHoy').innerHTML = `Ventas hoy: $${ventas}`;
+        
+        let carrito = [];
+        let total = 0;
+        
+        const precios = {
+            'Papa': 2.00,
+            'Cebolla': 1.50,
+            'Tomate': 2.50
+        };
+        
+        function agregar(producto) {
+            carrito.push(producto);
+            total += precios[producto];
+            
+            document.getElementById('cantidad').innerText = carrito.length;
+            document.getElementById('total').innerText = total.toFixed(2);
+            document.getElementById('carrito').style.display = 'block';
+            
+            // Animación
+            tg.HapticFeedback.impactOccurred('light');
         }
-
-        function addToCart(item) {
-            cart.push(item);
-            document.getElementById('cart-bar').style.display = 'block';
-            document.getElementById('cart-count').innerText = cart.length;
-        }
-
-        function finishSale() {
-            tg.sendData("VENTA_MULTIPLE:" + cart.join(","));
-            tg.close();
-        }
-
-        function sendCmd(type) {
-            tg.sendData("ADMIN:" + type);
+        
+        function pagar() {
+            if (carrito.length === 0) {
+                tg.showAlert('Agrega productos primero');
+                return;
+            }
+            
+            // Enviar datos al bot
+            tg.sendData(carrito.join(','));
             tg.close();
         }
     </script>
