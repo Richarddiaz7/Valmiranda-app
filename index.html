@@ -2,153 +2,467 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda - Tienda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Valmiranda - Víveres y Frutas</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f0f2f5;
             padding: 16px;
-            padding-bottom: 100px;
+            padding-bottom: 140px;
         }
+
+        /* Encabezado */
         .header {
+            background: linear-gradient(135deg, #27ae60, #219a52);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            gap: 12px;
+        }
+
+        .stat {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 12px;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        /* Categorías */
+        .categorias {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .cat-btn {
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .cat-btn.active {
             background: #27ae60;
             color: white;
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
         }
+
+        /* Productos */
         .producto {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .producto-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 12px;
         }
-        .producto-info h3 {
+
+        .producto-nombre {
+            font-size: 18px;
+            font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 5px;
         }
-        .producto-info p {
+
+        .producto-precio {
             color: #27ae60;
             font-weight: bold;
         }
-        button {
+
+        .precio-usd {
+            font-size: 18px;
+        }
+
+        .precio-bs {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .producto-control {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .control-cantidad {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f0f2f5;
+            padding: 8px 12px;
+            border-radius: 30px;
+        }
+
+        .control-cantidad button {
+            background: #27ae60;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .control-cantidad span {
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .control-peso {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0f2f5;
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+
+        .control-peso input {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .control-peso span {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .btn-agregar {
             background: #27ae60;
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 25px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 16px;
         }
-        button:active { transform: scale(0.98); }
+
+        /* Carrito */
         .carrito {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: white;
-            padding: 16px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             border-top: 3px solid #27ae60;
+            padding: 16px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+            border-radius: 20px 20px 0 0;
         }
+
+        .carrito-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .carrito-items {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .carrito-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
         .total {
             font-size: 20px;
             font-weight: bold;
             color: #27ae60;
-            margin: 10px 0;
+            text-align: right;
+            margin: 12px 0;
         }
+
         .btn-pagar {
             width: 100%;
             background: #27ae60;
+            color: white;
+            border: none;
             padding: 14px;
-            font-size: 18px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .tasa-info {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h2>🏪 BODEGA VALMIRANDA</h2>
-        <p id="ventasHoy">Ventas hoy: $0</p>
+        <h1>🏪 VIVERES VALMIRANDA</h1>
+        <div class="stats">
+            <div class="stat">💰 Ventas hoy<br><span id="ventasHoy">$0</span></div>
+            <div class="stat">💶 Tasa Bs<br><span id="tasaDisplay">0</span></div>
+        </div>
+    </div>
+
+    <div class="categorias">
+        <button class="cat-btn active" data-cat="todos">🍽️ TODOS</button>
+        <button class="cat-btn" data-cat="verdura">🥬 VERDURAS</button>
+        <button class="cat-btn" data-cat="fruta">🍎 FRUTAS</button>
+        <button class="cat-btn" data-cat="viveres">📦 VÍVERES</button>
     </div>
 
     <div id="productos"></div>
 
     <div class="carrito" id="carrito" style="display: none;">
-        <div>🛒 Carrito: <span id="cantidad">0</span> productos</div>
-        <div class="total">Total: $<span id="total">0.00</span></div>
+        <div class="carrito-header">
+            <span>🛒 CARRITO</span>
+            <span id="carritoCount">0 items</span>
+        </div>
+        <div class="carrito-items" id="carritoItems"></div>
+        <div class="total">
+            <div>USD: $<span id="totalUSD">0.00</span></div>
+            <div>Bs: <span id="totalBS">0.00</span></div>
+        </div>
         <button class="btn-pagar" onclick="pagar()">✅ PAGAR AHORA</button>
+        <div class="tasa-info" id="tasaInfo"></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
-        
-        // Obtener ventas de la URL
+
+        // Obtener parámetros de URL
         const urlParams = new URLSearchParams(window.location.search);
-        const ventas = urlParams.get('v') || '0';
-        document.getElementById('ventasHoy').innerHTML = `Ventas hoy: $${ventas}`;
-        
+        let ventasHoy = parseFloat(urlParams.get('v')) || 0;
+        let tasa = parseFloat(urlParams.get('tasa')) || 60;
+
+        document.getElementById('ventasHoy').innerHTML = `$${ventasHoy.toFixed(2)}`;
+        document.getElementById('tasaDisplay').innerHTML = `${tasa.toFixed(0)}`;
+        document.getElementById('tasaInfo').innerHTML = `💵 1 USD = ${tasa.toFixed(2)} Bs`;
+
         // Productos disponibles
         const productos = [
-            { nombre: 'Papa', precio: 2.00, emoji: '🥔' },
-            { nombre: 'Cebolla', precio: 1.50, emoji: '🧅' },
-            { nombre: 'Tomate', precio: 2.50, emoji: '🍅' }
+            // VERDURAS (por peso)
+            { id: 1, nombre: '🥔 Papa', precio_usd: 2.00, precio_bs: 2.00 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
+            { id: 2, nombre: '🧅 Cebolla', precio_usd: 1.50, precio_bs: 1.50 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
+            { id: 3, nombre: '🍅 Tomate', precio_usd: 2.50, precio_bs: 2.50 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
+            { id: 4, nombre: '🥬 Lechuga', precio_usd: 1.20, precio_bs: 1.20 * tasa, categoria: 'verdura', tipo: 'unidad', unidad: 'unidad' },
+            { id: 5, nombre: '🥕 Zanahoria', precio_usd: 1.00, precio_bs: 1.00 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
+            { id: 6, nombre: '🫑 Pimentón', precio_usd: 1.80, precio_bs: 1.80 * tasa, categoria: 'verdura', tipo: 'peso', unidad: 'kg' },
+            
+            // FRUTAS (por peso)
+            { id: 7, nombre: '🍌 Cambur', precio_usd: 1.20, precio_bs: 1.20 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
+            { id: 8, nombre: '🍎 Manzana', precio_usd: 3.00, precio_bs: 3.00 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
+            { id: 9, nombre: '🍊 Naranja', precio_usd: 1.50, precio_bs: 1.50 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
+            { id: 10, nombre: '🍓 Fresa', precio_usd: 4.50, precio_bs: 4.50 * tasa, categoria: 'fruta', tipo: 'peso', unidad: 'kg' },
+            
+            // VÍVERES (por unidad)
+            { id: 11, nombre: '🍚 Arroz 1kg', precio_usd: 1.80, precio_bs: 1.80 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
+            { id: 12, nombre: '🍬 Azúcar 1kg', precio_usd: 1.20, precio_bs: 1.20 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
+            { id: 13, nombre: '🥛 Leche 1L', precio_usd: 1.50, precio_bs: 1.50 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
+            { id: 14, nombre: '🫘 Caraotas', precio_usd: 2.00, precio_bs: 2.00 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'kg' },
+            { id: 15, nombre: '🌽 Harina Pan', precio_usd: 2.50, precio_bs: 2.50 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' },
+            { id: 16, nombre: '🫒 Aceite 1L', precio_usd: 3.50, precio_bs: 3.50 * tasa, categoria: 'viveres', tipo: 'unidad', unidad: 'unidad' }
         ];
-        
+
         let carrito = [];
-        let totalCarrito = 0;
-        
-        // Mostrar productos
-        const contenedor = document.getElementById('productos');
-        productos.forEach(p => {
-            const div = document.createElement('div');
-            div.className = 'producto';
-            div.innerHTML = `
-                <div class="producto-info">
-                    <h3>${p.emoji} ${p.nombre}</h3>
-                    <p>$${p.precio.toFixed(2)}</p>
-                </div>
-                <button onclick="agregar('${p.nombre}', ${p.precio})">➕ Agregar</button>
-            `;
-            contenedor.appendChild(div);
-        });
-        
-        function agregar(nombre, precio) {
-            carrito.push({ nombre, precio });
-            totalCarrito += precio;
+
+        // Renderizar productos
+        function renderizarProductos(categoria = 'todos') {
+            const contenedor = document.getElementById('productos');
+            contenedor.innerHTML = '';
+            
+            const filtrados = categoria === 'todos' 
+                ? productos 
+                : productos.filter(p => p.categoria === categoria);
+            
+            filtrados.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'producto';
+                div.innerHTML = `
+                    <div class="producto-info">
+                        <div class="producto-nombre">${p.nombre}</div>
+                        <div class="producto-precio">
+                            <div class="precio-usd">$${p.precio_usd}</div>
+                            <div class="precio-bs">Bs ${p.precio_bs.toFixed(0)}</div>
+                        </div>
+                    </div>
+                    <div class="producto-control">
+                        ${p.tipo === 'peso' ? `
+                            <div class="control-peso">
+                                <input type="number" id="peso-${p.id}" value="1" step="0.5" min="0.5">
+                                <span>${p.unidad}</span>
+                            </div>
+                        ` : `
+                            <div class="control-cantidad">
+                                <button onclick="cambiarCantidad(${p.id}, -1)">-</button>
+                                <span id="cant-${p.id}">1</span>
+                                <button onclick="cambiarCantidad(${p.id}, 1)">+</button>
+                            </div>
+                        `}
+                        <button class="btn-agregar" onclick="agregarAlCarrito(${p.id})">➕ Agregar</button>
+                    </div>
+                `;
+                contenedor.appendChild(div);
+            });
+        }
+
+        function cambiarCantidad(id, delta) {
+            const span = document.getElementById(`cant-${id}`);
+            let actual = parseInt(span.innerText);
+            actual += delta;
+            if (actual < 1) actual = 1;
+            span.innerText = actual;
+        }
+
+        function agregarAlCarrito(id) {
+            const producto = productos.find(p => p.id === id);
+            let cantidad = 1;
+            
+            if (producto.tipo === 'peso') {
+                const input = document.getElementById(`peso-${id}`);
+                cantidad = parseFloat(input.value);
+                if (isNaN(cantidad) || cantidad <= 0) cantidad = 1;
+            } else {
+                const span = document.getElementById(`cant-${id}`);
+                cantidad = parseInt(span.innerText);
+            }
+            
+            // Buscar si ya está en el carrito
+            const existente = carrito.find(item => item.id === id);
+            if (existente) {
+                existente.cantidad += cantidad;
+            } else {
+                carrito.push({
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    cantidad: cantidad,
+                    precio_usd: producto.precio_usd,
+                    unidad: producto.unidad,
+                    tipo: producto.tipo
+                });
+            }
+            
             actualizarCarrito();
             
-            // Vibración (si soporta)
             if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
-        
+
         function actualizarCarrito() {
-            document.getElementById('cantidad').innerText = carrito.length;
-            document.getElementById('total').innerText = totalCarrito.toFixed(2);
-            document.getElementById('carrito').style.display = carrito.length > 0 ? 'block' : 'none';
+            const carritoDiv = document.getElementById('carrito');
+            const carritoItemsDiv = document.getElementById('carritoItems');
+            const totalUSD = document.getElementById('totalUSD');
+            const totalBS = document.getElementById('totalBS');
+            const carritoCount = document.getElementById('carritoCount');
+            
+            if (carrito.length === 0) {
+                carritoDiv.style.display = 'none';
+                return;
+            }
+            
+            carritoDiv.style.display = 'block';
+            
+            let sumUSD = 0;
+            let itemsHtml = '';
+            
+            carrito.forEach((item, index) => {
+                const subtotalUSD = item.precio_usd * item.cantidad;
+                sumUSD += subtotalUSD;
+                itemsHtml += `
+                    <div class="carrito-item">
+                        <span>${item.nombre}</span>
+                        <span>${item.cantidad} ${item.unidad} x $${item.precio_usd.toFixed(2)}</span>
+                        <span>$${subtotalUSD.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+            
+            const sumBS = sumUSD * tasa;
+            
+            carritoItemsDiv.innerHTML = itemsHtml;
+            totalUSD.innerText = sumUSD.toFixed(2);
+            totalBS.innerText = sumBS.toFixed(2);
+            carritoCount.innerText = `${carrito.length} items`;
         }
-        
+
         function pagar() {
             if (carrito.length === 0) {
                 tg.showAlert('Agrega productos primero');
                 return;
             }
             
-            const productosStr = carrito.map(p => p.nombre).join(',');
-            console.log('Enviando:', productosStr);
-            tg.sendData(productosStr);
+            const productosParaEnviar = carrito.map(item => ({
+                nombre: item.nombre.split(' ')[1] || item.nombre,
+                cantidad: item.cantidad,
+                tipo: item.tipo
+            }));
+            
+            const datos = {
+                productos: productosParaEnviar,
+                tasa: tasa
+            };
+            
+            tg.sendData(JSON.stringify(datos));
             tg.close();
         }
+
+        // Event listeners para categorías
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderizarProductos(btn.dataset.cat);
+            });
+        });
+
+        // Inicializar
+        renderizarProductos();
     </script>
 </body>
 </html>
