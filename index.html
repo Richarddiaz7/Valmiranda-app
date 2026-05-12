@@ -3,24 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valmiranda Tienda</title>
+    <title>Valmiranda - Tienda</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f2f5;
             padding: 16px;
-            background: #f5f5f5;
+            padding-bottom: 100px;
+        }
+        .header {
+            background: #27ae60;
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
         }
         .producto {
             background: white;
             border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .producto-info h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .producto-info p {
+            color: #27ae60;
+            font-weight: bold;
         }
         button {
             background: #27ae60;
@@ -28,10 +45,11 @@
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
-            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 16px;
         }
+        button:active { transform: scale(0.98); }
         .carrito {
             position: fixed;
             bottom: 0;
@@ -48,70 +66,76 @@
             color: #27ae60;
             margin: 10px 0;
         }
-        .ventas-hoy {
+        .btn-pagar {
+            width: 100%;
             background: #27ae60;
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: center;
+            padding: 14px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <div class="ventas-hoy" id="ventasHoy">
-        Ventas hoy: $0.00
+    <div class="header">
+        <h2>🏪 BODEGA VALMIRANDA</h2>
+        <p id="ventasHoy">Ventas hoy: $0</p>
     </div>
 
-    <div id="productos">
-        <div class="producto">
-            <span>🥔 Papa (1kg) - $2.00</span>
-            <button onclick="agregar('Papa')">Agregar</button>
-        </div>
-        <div class="producto">
-            <span>🧅 Cebolla (1kg) - $1.50</span>
-            <button onclick="agregar('Cebolla')">Agregar</button>
-        </div>
-        <div class="producto">
-            <span>🍅 Tomate (1kg) - $2.50</span>
-            <button onclick="agregar('Tomate')">Agregar</button>
-        </div>
-    </div>
+    <div id="productos"></div>
 
     <div class="carrito" id="carrito" style="display: none;">
         <div>🛒 Carrito: <span id="cantidad">0</span> productos</div>
         <div class="total">Total: $<span id="total">0.00</span></div>
-        <button style="width: 100%; margin-top: 10px;" onclick="pagar()">💰 Pagar</button>
+        <button class="btn-pagar" onclick="pagar()">✅ PAGAR AHORA</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.enableClosingConfirmation();
         
-        // Mostrar ventas del día desde la URL
-        const params = new URLSearchParams(window.location.search);
-        const ventas = params.get('v') || '0';
+        // Obtener ventas de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const ventas = urlParams.get('v') || '0';
         document.getElementById('ventasHoy').innerHTML = `Ventas hoy: $${ventas}`;
         
+        // Productos disponibles
+        const productos = [
+            { nombre: 'Papa', precio: 2.00, emoji: '🥔' },
+            { nombre: 'Cebolla', precio: 1.50, emoji: '🧅' },
+            { nombre: 'Tomate', precio: 2.50, emoji: '🍅' }
+        ];
+        
         let carrito = [];
-        let total = 0;
+        let totalCarrito = 0;
         
-        const precios = {
-            'Papa': 2.00,
-            'Cebolla': 1.50,
-            'Tomate': 2.50
-        };
+        // Mostrar productos
+        const contenedor = document.getElementById('productos');
+        productos.forEach(p => {
+            const div = document.createElement('div');
+            div.className = 'producto';
+            div.innerHTML = `
+                <div class="producto-info">
+                    <h3>${p.emoji} ${p.nombre}</h3>
+                    <p>$${p.precio.toFixed(2)}</p>
+                </div>
+                <button onclick="agregar('${p.nombre}', ${p.precio})">➕ Agregar</button>
+            `;
+            contenedor.appendChild(div);
+        });
         
-        function agregar(producto) {
-            carrito.push(producto);
-            total += precios[producto];
+        function agregar(nombre, precio) {
+            carrito.push({ nombre, precio });
+            totalCarrito += precio;
+            actualizarCarrito();
             
+            // Vibración (si soporta)
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+        
+        function actualizarCarrito() {
             document.getElementById('cantidad').innerText = carrito.length;
-            document.getElementById('total').innerText = total.toFixed(2);
-            document.getElementById('carrito').style.display = 'block';
-            
-            // Animación
-            tg.HapticFeedback.impactOccurred('light');
+            document.getElementById('total').innerText = totalCarrito.toFixed(2);
+            document.getElementById('carrito').style.display = carrito.length > 0 ? 'block' : 'none';
         }
         
         function pagar() {
@@ -120,8 +144,9 @@
                 return;
             }
             
-            // Enviar datos al bot
-            tg.sendData(carrito.join(','));
+            const productosStr = carrito.map(p => p.nombre).join(',');
+            console.log('Enviando:', productosStr);
+            tg.sendData(productosStr);
             tg.close();
         }
     </script>
